@@ -1418,6 +1418,15 @@ function _playBGMLoop(){
   _bgmSource.loop=true;
   _bgmSource.connect(_bgmGain);
   _bgmSource.start(0);
+  // Media Session APIでステータスバー通知を抑制
+  if('mediaSession' in navigator){
+    navigator.mediaSession.metadata=null;
+    navigator.mediaSession.setActionHandler('play',null);
+    navigator.mediaSession.setActionHandler('pause',null);
+    navigator.mediaSession.setActionHandler('stop',null);
+    navigator.mediaSession.setActionHandler('previoustrack',null);
+    navigator.mediaSession.setActionHandler('nexttrack',null);
+  }
 }
 function setBGMVolume(v){
   if(_bgmGain) _bgmGain.gain.value=v;
