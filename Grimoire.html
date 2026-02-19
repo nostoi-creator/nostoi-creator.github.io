@@ -1394,7 +1394,9 @@ async function loadOnlineResources(){
   try{await document.fonts.ready;}catch(e){}
   if(options.animation) initParticles();
   const bgm=document.getElementById('bgm-main');
-  if(bgm.src&&bgm.src!==location.href){bgm.volume=options.bgmVol/100; bgm.play().catch(()=>{});}
+  bgm.src='https://nostoi-creator.github.io/gm-bgm.m4a';
+  bgm.volume=options.bgmVol/100;
+  bgm.play().catch(()=>{});
 }
 function launchApp(){
   const app=document.getElementById('app');
