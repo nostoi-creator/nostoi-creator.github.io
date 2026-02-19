@@ -1393,16 +1393,49 @@ function returnToTitle(){
     setTimeout(()=>t.style.opacity='1',30);
   },300);
 }
+// ══ WebAudio BGM ══
+let _bgmCtx=null, _bgmSource=null, _bgmGain=null, _bgmBuffer=null;
+async function initWebAudioBGM(url, vol){
+  try{
+    _bgmCtx=new (window.AudioContext||window.webkitAudioContext)();
+    _bgmGain=_bgmCtx.createGain();
+    _bgmGain.gain.value=vol;
+    _bgmGain.connect(_bgmCtx.destination);
+    const res=await fetch(url);
+    const arr=await res.arrayBuffer();
+    _bgmBuffer=await _bgmCtx.decodeAudioData(arr);
+    _playBGMLoop();
+  }catch(e){
+    // WebAudio失敗時は通常のaudioタグにフォールバック
+    const bgm=document.getElementById('bgm-main');
+    bgm.src=url; bgm.volume=vol; bgm.play().catch(()=>{});
+  }
+}
+function _playBGMLoop(){
+  if(!_bgmCtx||!_bgmBuffer)return;
+  _bgmSource=_bgmCtx.createBufferSource();
+  _bgmSource.buffer=_bgmBuffer;
+  _bgmSource.loop=true;
+  _bgmSource.connect(_bgmGain);
+  _bgmSource.start(0);
+}
+function setBGMVolume(v){
+  if(_bgmGain) _bgmGain.gain.value=v;
+  else document.getElementById('bgm-main').volume=v;
+}
+function stopBGM(){
+  if(_bgmSource){try{_bgmSource.stop();}catch(e){} _bgmSource=null;}
+  if(_bgmCtx){_bgmCtx.close(); _bgmCtx=null;}
+  const bgm=document.getElementById('bgm-main');
+  bgm.pause(); bgm.src='';
+}
 async function loadOnlineResources(){
   const l=document.createElement('link'); l.rel='stylesheet';
   l.href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Serif+JP:wght@300;400;600&display=swap';
   document.head.appendChild(l);
   try{await document.fonts.ready;}catch(e){}
   if(options.animation) initParticles();
-  const bgm=document.getElementById('bgm-main');
-  bgm.src='https://nostoi-creator.github.io/gm-bgm.m4a';
-  bgm.volume=options.bgmVol/100;
-  bgm.play().catch(()=>{});
+  initWebAudioBGM('https://nostoi-creator.github.io/gm-bgm.m4a', options.bgmVol/100);
 }
 function launchApp(){
   const app=document.getElementById('app');
@@ -1579,7 +1612,7 @@ function onAnimationToggle(){options.animation=document.getElementById('opt-anim
 function onVolumeChange(t,v){
   const n=parseInt(v);
   if(t==='se'){options.seVol=n;document.getElementById('se-vol-label').textContent=n;document.getElementById('opt-se-vol').style.setProperty('--val',n+'%');}
-  else{options.bgmVol=n;document.getElementById('bgm-vol-label').textContent=n;document.getElementById('opt-bgm-vol').style.setProperty('--val',n+'%');document.getElementById('bgm-main').volume=n/100;}
+  else{options.bgmVol=n;document.getElementById('bgm-vol-label').textContent=n;document.getElementById('opt-bgm-vol').style.setProperty('--val',n+'%');setBGMVolume(n/100);}
   saveOptions();
 }
 
