@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Nóstoi — Grimoire</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0e0c09">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Grimoire">
 <style>
 :root {
   --bg:#0e0c09; --bg2:#161310; --bg3:#1c1814;
@@ -2645,6 +2651,10 @@ function showBagBtn(){document.getElementById('bag-btn').classList.add('visible'
   if(worldDB)populateDBCatFilter();
   if(apiKey)unlockAnalyze();
   showView('char-list-view');
+  // Service Worker登録
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  }
 })();
 </script>
 </body>
