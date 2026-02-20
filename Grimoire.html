@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+<style>html,body{background:#000;}</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Nóstoi — Grimoire</title>
@@ -107,7 +108,7 @@ body.title-active{overflow:hidden;}
   text-shadow:0 0 6px rgba(255,255,255,0.15),0 1px 4px rgba(0,0,0,0.9);
 }
 #title-start{cursor:pointer;user-select:none;}
-.blink-text{font-family:var(--font-display);font-size:clamp(0.75rem,2vw,0.95rem);letter-spacing:0.5em;color:var(--parchment-dim);text-transform:uppercase;animation:blink 3s ease-in-out infinite;display:inline-block;padding:0.5rem 1.5rem;}
+.blink-text{font-family:var(--font-display);font-size:clamp(0.75rem,2vw,0.95rem);letter-spacing:0.5em;color:#C1AB8F;text-transform:uppercase;animation:blink 3s ease-in-out infinite;display:inline-block;padding:0.5rem 1.5rem;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
 #title-start:hover .blink-text{color:var(--parchment);animation-play-state:paused;opacity:1;}
 #title-btn-container{margin-top:clamp(3rem,8vh,5rem);min-height:clamp(4rem,10vh,6rem);display:flex;align-items:center;justify-content:center;position:relative;}
@@ -983,7 +984,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
   <div class="options-body">
     <div class="options-section">
       <div class="options-section-title">ナビゲーション</div>
-      <button class="btn btn-g" onclick="returnToTitle()">↩ タイトルに戻る</button>
+      <button class="btn btn-g" onclick="playSETitle();returnToTitle()">↩ タイトルに戻る</button>
       <p style="font-size:0.7rem;color:var(--parchment-dk);margin-top:0.5rem;line-height:1.8;">タイトル画面に戻り、ONLINE / OFFLINEを選び直せます。</p>
     </div>
       <div class="options-section-title">表示</div>
@@ -1378,21 +1379,28 @@ async function proceedMode(mode){
       loadingEl.style.display='none';
     } else {
       loadingEl.style.animation='';
-      // フォント読み込み中はタイトルテキストをフェードアウトして変化を隠す
-      const titleText=document.getElementById('title-text');
-      titleText.style.opacity='0';
-      loadingEl.textContent='フォント読み込み中…';
-      await loadFonts();
-      titleText.style.opacity='1';
       loadingEl.textContent='サウンド読み込み中…';
       await preloadBGM('https://nostoi-creator.github.io/gm-bgm.m4a?v='+Date.now(), options.bgmVol/100);
       loadingEl.textContent='完了';
       await new Promise(r=>setTimeout(r,400));
     }
   }
+  // 黒オーバーレイで全体を3秒かけてフェードアウト
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:500;background:#000;opacity:0;transition:opacity 2s;pointer-events:none;';
+  document.body.appendChild(overlay);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ overlay.style.opacity='1'; }));
+  // オーバーレイが完全に黒い間にフォント読み込み（ONLINEのみ）
+  if(isOnline) await loadFonts();
+  await new Promise(r=>setTimeout(r,2100));
+  // 完全に黒い状態でタイトル→メイン切り替え
   const t=document.getElementById('title-screen');
-  t.classList.add('fade-out');
-  setTimeout(()=>{t.style.display='none'; launchApp();},800);
+  t.style.display='none';
+  launchApp();
+  await new Promise(r=>setTimeout(r,200));
+  overlay.style.transition='opacity 0.8s';
+  overlay.style.opacity='0';
+  setTimeout(()=>overlay.remove(), 900);
 }
 function checkNetworkConnection(){
   return navigator.onLine;
@@ -1441,7 +1449,6 @@ async function returnToTitle(){
     pc.classList.remove('visible');
     pc.style.transition='opacity 1s';
     pc.style.opacity='';
-    overlay.remove();
     const t=document.getElementById('title-screen');
     t.style.display='flex'; t.style.opacity='0';
     t.classList.remove('fade-out');
@@ -1450,7 +1457,15 @@ async function returnToTitle(){
     document.getElementById('title-mode').classList.remove('visible');
     document.getElementById('title-mode').style.pointerEvents='';
     document.getElementById('title-loading').style.display='none';
-    setTimeout(()=>t.style.opacity='1',30);
+    document.getElementById('title-text').style.opacity='1';
+    document.getElementById('title-text').style.transition='';
+    // タイトルフェードインとオーバーレイフェードアウトを同時に開始
+    setTimeout(()=>{
+      t.style.opacity='1';
+      overlay.style.transition='opacity 1s';
+      overlay.style.opacity='0';
+      setTimeout(()=>overlay.remove(), 1100);
+    },30);
   },300);
 }
 // ══ WebAudio BGM ══
