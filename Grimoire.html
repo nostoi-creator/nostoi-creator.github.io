@@ -1342,15 +1342,19 @@ function cancelMode(modalId){
 async function proceedMode(mode){
   isOnline=(mode==='online');
   const loadingEl=document.getElementById('title-loading');
+  const modeEl=document.getElementById('title-mode');
   if(isOnline){
-    document.getElementById('title-mode').style.opacity='0';
-    document.getElementById('title-mode').style.transition='opacity 0.3s';
+    // 選択肢を即座に操作不可にしてからフェードアウト
+    modeEl.style.pointerEvents='none';
+    modeEl.style.transition='opacity 0.3s';
+    modeEl.style.opacity='0';
     loadingEl.textContent='接続確認中…';
     loadingEl.style.display='block';
+    await new Promise(r=>setTimeout(r,350)); // フェードアウト完了待ち
+    modeEl.style.display='none';
     // ── ネット接続チェック ──
     const connected=checkNetworkConnection();
     if(!connected){
-      // 接続不可 → メッセージ表示してオフライン経路へ
       isOnline=false;
       loadingEl.style.animation='none';
       loadingEl.style.opacity='1';
@@ -1362,10 +1366,8 @@ async function proceedMode(mode){
       loadingEl.style.display='none';
     } else {
       loadingEl.style.animation='';
-      // フォント読み込み
       loadingEl.textContent='フォント読み込み中…';
       await loadFonts();
-      // BGM読み込み
       loadingEl.textContent='サウンド読み込み中…';
       await preloadBGM('https://nostoi-creator.github.io/gm-bgm.m4a?v='+Date.now(), options.bgmVol/100);
       loadingEl.textContent='完了';
@@ -1381,7 +1383,7 @@ function checkNetworkConnection(){
 }
 async function returnToTitle(){
   closeOptions();
-  await fadeOutAllSounds(1.2);
+  await fadeOutAllSounds(3);
   document.getElementById('offline-overlay').classList.remove('visible');
   document.body.classList.remove('offline');
   document.getElementById('bnav-analyze').classList.remove('disabled');
@@ -1516,12 +1518,22 @@ function launchApp(){
     document.getElementById('opt-sound-section').style.display='block';
     fetchAnnounce();
     if(options.animation) initParticles();
-    // BGM再生：バッファ取得済みなら即時・フォールバックならaudioタグ
+    // BGM再生：0から3秒かけてフェードイン
     if(_bgmBuffer&&_bgmCtx){
+      _bgmGain.gain.value=0;
       _playBGMLoop();
+      const target=options.bgmVol/100;
+      _bgmGain.gain.linearRampToValueAtTime(target, _bgmCtx.currentTime+3);
     } else if(_bgmFallbackUrl){
       const bgm=document.getElementById('bgm-main');
-      bgm.src=_bgmFallbackUrl; bgm.volume=_bgmFallbackVol; bgm.play().catch(()=>{});
+      bgm.src=_bgmFallbackUrl; bgm.volume=0;
+      bgm.play().catch(()=>{});
+      const target=_bgmFallbackVol;
+      const step=target/(3000/50);
+      const iv=setInterval(()=>{
+        bgm.volume=Math.min(target, bgm.volume+step);
+        if(bgm.volume>=target) clearInterval(iv);
+      },50);
     }
   } else {
     badge.style.display='block';
