@@ -1367,7 +1367,7 @@ async function proceedMode(mode){
       await loadFonts();
       // BGM読み込み
       loadingEl.textContent='サウンド読み込み中…';
-      await preloadBGM('https://nostoi-creator.github.io/gm-bgm.m4a', options.bgmVol/100);
+      await preloadBGM('https://nostoi-creator.github.io/gm-bgm.m4a?v='+Date.now(), options.bgmVol/100);
       loadingEl.textContent='完了';
       await new Promise(r=>setTimeout(r,400));
     }
