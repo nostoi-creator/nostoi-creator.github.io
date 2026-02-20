@@ -28,8 +28,9 @@ body{
     radial-gradient(ellipse at 10% 110%, rgba(200,65,5,0.2) 0%, transparent 35%),
     radial-gradient(ellipse at 90% 110%, rgba(200,65,5,0.2) 0%, transparent 35%),
     radial-gradient(ellipse at 50% 50%, #2e1206 0%, #1a0a03 70%);
-  color:var(--ink);font-family:var(--font-serif);min-height:100vh;font-size:14px;overflow-x:hidden;
+  color:var(--ink);font-family:var(--font-serif);min-height:100vh;font-size:14px;overflow:hidden;
   padding-bottom:calc(60px + env(safe-area-inset-bottom));}
+body.app-active{overflow-y:auto;}
 body.offline{
   background:#000;
   background-image:none;
@@ -84,8 +85,11 @@ body.offline #bg-image{filter:brightness(0.5);}
   position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;
   transition:opacity 0.8s;
   background:#000;
+  overflow:hidden;
 }
 #title-screen.fade-out{opacity:0;pointer-events:none;}
+/* タイトル画面表示中はbodyスクロール禁止 */
+body.title-active{overflow:hidden;}
 .title-nostoi{
   font-family:var(--font-display);font-size:clamp(3.5rem,12vw,7rem);font-weight:300;letter-spacing:0.15em;
   color:var(--parchment);line-height:1;text-align:center;
@@ -102,15 +106,19 @@ body.offline #bg-image{filter:brightness(0.5);}
   -webkit-text-stroke:0.6px rgba(255,255,255,0.85);
   text-shadow:0 0 6px rgba(255,255,255,0.15),0 1px 4px rgba(0,0,0,0.9);
 }
-#title-start{margin-top:clamp(3rem,8vh,5rem);cursor:pointer;user-select:none;}
+#title-start{cursor:pointer;user-select:none;}
 .blink-text{font-family:var(--font-display);font-size:clamp(0.75rem,2vw,0.95rem);letter-spacing:0.5em;color:var(--parchment-dim);text-transform:uppercase;animation:blink 3s ease-in-out infinite;display:inline-block;padding:0.5rem 1.5rem;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
 #title-start:hover .blink-text{color:var(--parchment);animation-play-state:paused;opacity:1;}
-#title-mode{display:none;flex-direction:column;align-items:center;gap:1rem;margin-top:clamp(3rem,8vh,5rem);animation:fadeInUp 0.5s ease forwards;}
+#title-btn-container{margin-top:clamp(3rem,8vh,5rem);min-height:clamp(4rem,10vh,6rem);display:flex;align-items:center;justify-content:center;position:relative;}
+#title-mode{display:flex;flex-direction:column;align-items:center;gap:1rem;visibility:hidden;opacity:0;transition:opacity 0.3s;position:absolute;}
+#title-mode.visible{visibility:visible;opacity:1;}
+#title-start{position:absolute;transition:opacity 0.3s;}
+#title-start.hidden{opacity:0;pointer-events:none;}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .mode-btn{background:rgba(14,12,9,0.72);border:1px solid var(--border-hi);color:var(--parchment);font-family:var(--font-display);font-size:clamp(0.8rem,2.2vw,1rem);letter-spacing:0.5em;text-transform:uppercase;padding:0.75rem 2.5rem;cursor:pointer;transition:all 0.25s;width:240px;text-align:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
 .mode-btn:hover{border-color:var(--accent);color:var(--parchment);background:rgba(184,115,51,0.18);box-shadow:0 0 16px rgba(184,115,51,0.2);}
-#title-loading{display:none;margin-top:1.5rem;font-size:0.7rem;letter-spacing:0.3em;color:var(--parchment-dk);text-transform:uppercase;animation:blink 1.2s ease-in-out infinite;}
+#title-loading{display:none;position:absolute;bottom:-2.5rem;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:0.7rem;letter-spacing:0.3em;color:var(--parchment-dk);text-transform:uppercase;animation:blink 1.2s ease-in-out infinite;}
 
 /* ══ アプリ ══ */
 #app{display:none;opacity:0;transition:opacity 0.6s;position:relative;z-index:1;}
@@ -494,12 +502,14 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
     <div class="title-grimoire">Grimoire</div>
     <div class="title-sub-jp">ノストイ叙事詩環</div>
   </div>
-  <div id="title-start" onclick="playSETitle();onStartClick()"><span class="blink-text">START</span></div>
-  <div id="title-mode">
-    <button class="mode-btn" onclick="playSETitle();selectMode('online')">ONLINE</button>
-    <button class="mode-btn" onclick="playSETitle();selectMode('offline')">OFFLINE</button>
+  <div id="title-btn-container">
+    <div id="title-start" onclick="playSETitle();onStartClick()"><span class="blink-text">START</span></div>
+    <div id="title-mode">
+      <button class="mode-btn" onclick="playSETitle();selectMode('online')">ONLINE</button>
+      <button class="mode-btn" onclick="playSETitle();selectMode('offline')">OFFLINE</button>
+    </div>
+    <div id="title-loading">Loading…</div>
   </div>
-  <div id="title-loading">Loading…</div>
 </div>
 
 <!-- ══ メインアプリ ══ -->
@@ -1318,8 +1328,11 @@ const checkedCats={opp:new Set(),self:new Set()}, checkedModes=new Set();
 // ══ タイトル ══
 function onStartClick(){
   const s=document.getElementById('title-start');
-  s.style.opacity='0'; s.style.transition='opacity 0.4s';
-  setTimeout(()=>{s.style.display='none'; document.getElementById('title-mode').style.display='flex';},400);
+  s.classList.add('hidden');
+  setTimeout(()=>{
+    document.getElementById('title-start').classList.add('hidden');
+    document.getElementById('title-mode').classList.add('visible');
+  },400);
 }
 function selectMode(mode){
   const skipKey = mode==='online' ? 'gm_skip_online_confirm' : 'gm_skip_offline_confirm';
@@ -1346,12 +1359,10 @@ async function proceedMode(mode){
   if(isOnline){
     // 選択肢を即座に操作不可にしてからフェードアウト
     modeEl.style.pointerEvents='none';
-    modeEl.style.transition='opacity 0.3s';
-    modeEl.style.opacity='0';
+    modeEl.classList.remove('visible');
     loadingEl.textContent='接続確認中…';
     loadingEl.style.display='block';
-    await new Promise(r=>setTimeout(r,350)); // フェードアウト完了待ち
-    modeEl.style.display='none';
+    await new Promise(r=>setTimeout(r,350));
     // ── ネット接続チェック ──
     const connected=checkNetworkConnection();
     if(!connected){
@@ -1383,6 +1394,9 @@ function checkNetworkConnection(){
 }
 async function returnToTitle(){
   closeOptions();
+  document.body.classList.remove('app-active');
+  // suspend中のContextを先にresumeしてからフェードアウト
+  if(_bgmCtx&&_bgmCtx.state==='suspended') await _bgmCtx.resume().catch(()=>{});
   await fadeOutAllSounds(3);
   document.getElementById('offline-overlay').classList.remove('visible');
   document.body.classList.remove('offline');
@@ -1392,12 +1406,14 @@ async function returnToTitle(){
   setTimeout(()=>{
     app.style.display='none';
     stopParticles();
+    document.getElementById('particle-canvas').classList.remove('visible');
     const t=document.getElementById('title-screen');
     t.style.display='flex'; t.style.opacity='0';
     t.classList.remove('fade-out');
-    document.getElementById('title-start').style.display='none';
-    document.getElementById('title-mode').style.display='flex';
-    document.getElementById('title-mode').style.opacity='1';
+    document.body.classList.add('title-active');
+    document.getElementById('title-start').classList.remove('hidden');
+    document.getElementById('title-mode').classList.remove('visible');
+    document.getElementById('title-mode').style.pointerEvents='';
     document.getElementById('title-loading').style.display='none';
     setTimeout(()=>t.style.opacity='1',30);
   },300);
@@ -1456,6 +1472,8 @@ function setBGMVolume(v){
 // 全サウンドをフェードアウトして停止
 function fadeOutAllSounds(duration=1.2){
   return new Promise(resolve=>{
+    // suspendされていてもrampが効くようにresume
+    if(_bgmCtx&&_bgmCtx.state==='suspended') _bgmCtx.resume().catch(()=>{});
     const now=_bgmCtx?.currentTime||0;
     if(_bgmGain) _bgmGain.gain.linearRampToValueAtTime(0, now+duration);
     if(_ambGain) _ambGain.gain.linearRampToValueAtTime(0, now+duration);
@@ -1508,6 +1526,8 @@ async function loadOnlineResources(){
   if(options.animation) initParticles();
 }
 function launchApp(){
+  document.body.classList.remove('title-active');
+  document.body.classList.add('app-active');
   const app=document.getElementById('app');
   app.style.display='block'; setTimeout(()=>app.classList.add('visible'),30);
   const badge=document.getElementById('online-badge');
@@ -2766,6 +2786,7 @@ function showBagBtn(){document.getElementById('bag-btn').classList.add('visible'
 
 // ══ 起動 ══
 (function init(){
+  document.body.classList.add('title-active');
   characters=JSON.parse(localStorage.getItem(KEY_CHARS)||'[]');
   roles=JSON.parse(localStorage.getItem(KEY_ROLES)||'[]');
   worldDB=JSON.parse(localStorage.getItem(KEY_DB)||'null');
