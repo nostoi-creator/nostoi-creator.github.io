@@ -111,6 +111,7 @@ body.title-active{overflow:hidden;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
 #title-start:hover .blink-text{color:var(--parchment);animation-play-state:paused;opacity:1;}
 #title-btn-container{margin-top:clamp(3rem,8vh,5rem);min-height:clamp(4rem,10vh,6rem);display:flex;align-items:center;justify-content:center;position:relative;}
+#title-text{text-align:center;user-select:none;opacity:1;transition:opacity 0.4s;}
 #title-mode{display:flex;flex-direction:column;align-items:center;gap:1rem;visibility:hidden;opacity:0;transition:opacity 0.3s;position:absolute;}
 #title-mode.visible{visibility:visible;opacity:1;}
 #title-start{position:absolute;transition:opacity 0.3s;}
@@ -497,7 +498,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 
 <!-- ══ タイトル画面 ══ -->
 <div id="title-screen">
-  <div style="text-align:center;user-select:none;">
+  <div id="title-text" style="text-align:center;user-select:none;">
     <div class="title-nostoi">Nóstoi</div>
     <div class="title-grimoire">Grimoire</div>
     <div class="title-sub-jp">ノストイ叙事詩環</div>
@@ -1377,8 +1378,12 @@ async function proceedMode(mode){
       loadingEl.style.display='none';
     } else {
       loadingEl.style.animation='';
+      // フォント読み込み中はタイトルテキストをフェードアウトして変化を隠す
+      const titleText=document.getElementById('title-text');
+      titleText.style.opacity='0';
       loadingEl.textContent='フォント読み込み中…';
       await loadFonts();
+      titleText.style.opacity='1';
       loadingEl.textContent='サウンド読み込み中…';
       await preloadBGM('https://nostoi-creator.github.io/gm-bgm.m4a?v='+Date.now(), options.bgmVol/100);
       loadingEl.textContent='完了';
@@ -1393,20 +1398,50 @@ function checkNetworkConnection(){
   return navigator.onLine;
 }
 async function returnToTitle(){
-  closeOptions();
   document.body.classList.remove('app-active');
-  // suspend中のContextを先にresumeしてからフェードアウト
   if(_bgmCtx&&_bgmCtx.state==='suspended') await _bgmCtx.resume().catch(()=>{});
+
+  // 全要素を3秒かけて同時フェードアウト
+  const optPage=document.getElementById('options-page');
+  const app=document.getElementById('app');
+  const pc=document.getElementById('particle-canvas');
+
+  // 背景グラデーションを隠すオーバーレイを作成
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:200;background:#000;opacity:0;transition:opacity 3s;pointer-events:none;';
+  document.body.appendChild(overlay);
+
+  optPage.style.transition='opacity 3s';
+  app.style.transition='opacity 3s';
+  pc.style.transition='opacity 3s';
+
+  requestAnimationFrame(()=>{
+    optPage.style.opacity='0';
+    app.style.opacity='0';
+    pc.style.opacity='0';
+    overlay.style.opacity='1';
+  });
+
   await fadeOutAllSounds(3);
+
   document.getElementById('offline-overlay').classList.remove('visible');
   document.body.classList.remove('offline');
   document.getElementById('bnav-analyze').classList.remove('disabled');
-  const app=document.getElementById('app');
   app.classList.remove('visible');
+  optPage.classList.remove('open');
+  optPage.style.display='none';
+  optPage.style.opacity='';
+  optPage.style.transition='';
+
   setTimeout(()=>{
     app.style.display='none';
+    app.style.opacity='';
+    app.style.transition='opacity 0.6s';
     stopParticles();
-    document.getElementById('particle-canvas').classList.remove('visible');
+    pc.classList.remove('visible');
+    pc.style.transition='opacity 1s';
+    pc.style.opacity='';
+    overlay.remove();
     const t=document.getElementById('title-screen');
     t.style.display='flex'; t.style.opacity='0';
     t.classList.remove('fade-out');
