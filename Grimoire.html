@@ -163,10 +163,10 @@ body.title-active{overflow:hidden;}
 .bnav-item.disabled{color:var(--parchment-dk) !important;opacity:0.45;cursor:not-allowed;pointer-events:none;}
 .bnav-icon{font-size:1.1rem;}
 .bnav-label{font-size:0.58rem;letter-spacing:0.08em;}
-.bnav-icon-archive{filter:saturate(0.3) brightness(0.7);}
-#bnav-archive.active .bnav-icon-archive{filter:saturate(0.55) brightness(0.85);}
-.bnav-icon-analyze{filter:saturate(0) brightness(0.65) sepia(0.25);}
-#bnav-analyze.active .bnav-icon-analyze{filter:saturate(0.4) brightness(0.95) sepia(0.5);}
+.bnav-icon-archive{filter:saturate(0) brightness(0.65);}
+#bnav-archive.active .bnav-icon-archive{filter:saturate(0.5) brightness(0.9);}
+.bnav-icon-analyze{filter:saturate(0) brightness(0.65);}
+#bnav-analyze.active .bnav-icon-analyze{filter:saturate(0.5) brightness(0.9);}
 
 /* ── ページ ── */
 .page{display:none;padding:1.2rem 1rem;max-width:760px;margin:0 auto;}
@@ -253,7 +253,7 @@ select option{background:var(--bg2);}
 .dynamic-item-del:hover{color:#d47070;}
 
 /* シートプレビュー */
-.sheet-preview{background:var(--bg3);border:1px solid var(--border);border-radius:2px;padding:1rem 1.2rem;font-size:0.78rem;line-height:2;color:var(--ink-dim);white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto;font-family:'Courier New',monospace;}
+.sheet-preview{background:var(--bg3);border:1px solid var(--border);border-radius:2px;padding:1rem 1.2rem;font-size:0.8rem;line-height:2;color:var(--ink);white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto;font-family:var(--font-serif);letter-spacing:0.03em;}
 
 /* ── アーカイブ（世界観資料） ── */
 .archive-announce-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:0.5rem;}
@@ -268,16 +268,25 @@ select option{background:var(--bg2);}
 .archive-announce-card-date{font-size:0.65rem;color:var(--parchment-dk);}
 .archive-announce-card-arrow{font-size:0.65rem;color:var(--parchment-dk);transition:transform 0.2s;}
 .archive-announce-card-arrow.open{transform:rotate(90deg);}
-.archive-announce-card-body{display:none;padding:0.8rem 1rem 1rem;border-top:1px solid var(--border);font-size:0.82rem;color:var(--ink-dim);line-height:2;white-space:pre-wrap;}
-.archive-announce-card-body.open{display:block;}
-.archive-announce-empty{font-size:0.75rem;color:var(--parchment-dk);letter-spacing:0.1em;padding:0.5rem 0;}background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:0.9rem 1rem;margin-bottom:0.5rem;cursor:pointer;transition:all 0.15s;}
+.archive-announce-card-body{max-height:0;overflow:hidden;transition:max-height 0.35s cubic-bezier(0.22,1,0.36,1),opacity 0.3s ease;padding:0 1rem;border-top:0 solid var(--border);font-size:0.82rem;color:var(--ink-dim);line-height:2;white-space:pre-wrap;opacity:0;}
+.archive-announce-card-body.open{max-height:2000px;padding:0.8rem 1rem 1rem;border-top:1px solid var(--border);opacity:1;}
+.archive-announce-empty{font-size:0.75rem;color:var(--parchment-dk);letter-spacing:0.1em;padding:0.5rem 0;}
+.db-entry-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:0.9rem 1rem;margin-bottom:0.5rem;cursor:pointer;transition:all 0.15s;}
 .db-entry-card:hover{border-color:var(--border-hi);}
 .db-entry-title{font-size:0.88rem;color:var(--ink);}
 .db-entry-meta{font-size:0.68rem;color:var(--ink-dim);margin-top:0.25rem;}
-.db-entry-body{font-size:0.82rem;line-height:1.9;color:var(--ink-dim);margin-top:0.7rem;white-space:pre-wrap;word-break:break-word;display:none;}
-.db-entry-body.open{display:block;}
+.db-entry-body{font-size:0.82rem;line-height:1.9;color:var(--ink-dim);margin-top:0;white-space:pre-wrap;word-break:break-word;max-height:0;overflow:hidden;transition:max-height 0.35s cubic-bezier(0.22,1,0.36,1),margin-top 0.25s ease,opacity 0.3s ease;opacity:0;}
+.db-entry-body.open{max-height:2000px;margin-top:0.7rem;opacity:1;}
 .search-bar{display:flex;gap:0.5rem;margin-bottom:1rem;}
 .search-bar input{flex:1;}
+
+/* ── バックアップリマインダー ── */
+#backup-reminder{display:none;margin:0;background:rgba(74,63,50,0.5);border-bottom:1px solid var(--border);padding:0.6rem 1rem;animation:annBannerIn 0.4s ease both;}
+#backup-reminder.visible{display:flex;}
+.backup-reminder-inner{display:flex;align-items:center;gap:0.6rem;width:100%;max-width:760px;margin:0 auto;}
+.backup-reminder-text{font-size:0.7rem;color:var(--parchment-dim);letter-spacing:0.05em;flex:1;}
+.backup-reminder-text strong{color:var(--parchment);font-weight:normal;}
+.backup-reminder-btns{display:flex;gap:0.4rem;flex-shrink:0;}
 
 /* ── ロック ── */
 .locked-section{background:rgba(184,115,51,0.08);border:1px dashed var(--border);border-radius:2px;padding:1.5rem;text-align:center;margin-top:1.5rem;}
@@ -526,6 +535,17 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
   </div>
 
 
+  <!-- ── バックアップリマインダー ── -->
+  <div id="backup-reminder">
+    <div class="backup-reminder-inner">
+      <span class="backup-reminder-text">⚠ <strong>データのバックアップをお勧めします。</strong>前回のエクスポートから30日以上経過しています</span>
+      <div class="backup-reminder-btns">
+        <button class="btn btn-p btn-sm" onclick="exportData()">今すぐ保存</button>
+        <button class="btn btn-g btn-sm" onclick="dismissBackupReminder()">後で</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ── ロールプレイページ ── -->
   <div class="page active" id="page-roleplay">
 
@@ -633,7 +653,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
         </div>
         <label class="fl">ジョブ ※</label>
         <div style="display:flex;gap:0.5rem;align-items:center;">
-          <select id="sf-job-primary" style="flex:1;" onchange="updateJobDisplay()">
+          <select id="sf-job-primary" style="flex:1;" onchange="updateJobSelects()">
             <option value="">一次職（未選択）</option>
             <optgroup label="物理職">
               <option value="ᴠᴀɴɢᴜᴀʀᴅ">戦士 / ヴァンガード</option>
@@ -725,7 +745,8 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
     <div id="db-not-loaded" style="display:none;">
       <div class="empty">
         <div class="empty-icon">📚</div>
-        <div class="empty-text">アーカイブが読み込まれていません<br>オプションから読み込んでください</div>
+        <div class="empty-text">アーカイブが読み込まれていません</div>
+        <button class="btn btn-p btn-sm" style="margin-top:1rem;" onclick="openOptions();setTimeout(()=>{const el=document.getElementById('opt-db-section');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},320);">オプションで読み込む</button>
       </div>
     </div>
     <div id="db-content"></div>
@@ -733,11 +754,11 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 
   <!-- ── 分析ページ ── -->
   <div class="page" id="page-analyze">
-    <div class="sec-label">分析機能</div>
+    <div class="sec-label">グリモワール機能（AI補助）</div>
     <div id="analyze-locked" class="locked-section">
       <div class="locked-icon">🔒</div>
-      <div class="locked-title">分析機能は解放されていません</div>
-      <div class="locked-desc">分析機能を使用するにはAnthropic APIキーの登録が必要です。<br>APIキーは無料で取得できますが、使用量に応じた費用が発生します。</div>
+      <div class="locked-title">グリモワール機能は解放されていません</div>
+      <div class="locked-desc">グリモワール機能（AI補助）を使用するにはGoogle Gemini APIキーの登録が必要です。<br>APIキーは無料で取得できますが、使用量に応じた費用が発生します。</div>
       <button class="btn btn-p" onclick="openModal('modal-api-setup')">APIキーを登録して解放する</button>
     </div>
     <div id="analyze-unlocked" style="display:none;">
@@ -781,7 +802,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
       <div id="apanel-chat" style="display:none;flex-direction:column;height:calc(100vh - 210px);">
         <div id="chat-messages" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0.8rem;padding-bottom:0.5rem;min-height:0;"></div>
         <div style="display:flex;gap:0.5rem;align-items:flex-end;padding-top:0.8rem;border-top:1px solid var(--border);margin-top:0.5rem;flex-shrink:0;">
-          <textarea id="chat-input" rows="3" placeholder="Claudeに話しかける…" style="flex:1;resize:none;font-size:0.85rem;line-height:1.8;" onkeydown="chatKeydown(event)"></textarea>
+          <textarea id="chat-input" rows="3" placeholder="Geminiに話しかける…" style="flex:1;resize:none;font-size:0.85rem;line-height:1.8;" onkeydown="chatKeydown(event)"></textarea>
           <div style="display:flex;flex-direction:column;gap:0.4rem;">
             <button class="btn btn-p btn-sm" id="chat-send-btn" onclick="sendChat()">送信</button>
             <button class="btn btn-g btn-sm" onclick="clearChat()">消去</button>
@@ -920,12 +941,12 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 
       <div class="help-item">
         <div class="help-item-header" onclick="toggleHelp(this)">
-          <span class="help-item-title">分析機能を解放する</span>
+          <span class="help-item-title">グリモワール機能（AI補助）を解放する</span>
           <span class="help-item-arrow">▶</span>
         </div>
         <div class="help-item-body">
-          <p>分析機能にはAnthropicのAPIキーが必要です。<span class="help-tag">APIキーを登録して解放する</span> から登録画面を開いてください。</p>
-          <p>APIキーはconsole.anthropic.comで無料取得できます。ただし使用量に応じた費用（目安：1回あたり0.1〜0.5円）が発生します。費用の管理はご自身で行ってください。</p>
+          <p>グリモワール機能（AI補助）にはGoogle Gemini APIキーが必要です。<span class="help-tag">APIキーを登録して解放する</span> から登録画面を開いてください。</p>
+          <p>APIキーはaistudio.google.comで無料取得できます。ただし使用量に応じた費用（無料枠超過時）が発生する場合があります。費用の管理はご自身で行ってください。</p>
           <p>キーはこの端末のブラウザにのみ保存されます。他の端末で使う場合は再登録が必要です。</p>
         </div>
       </div>
@@ -1052,7 +1073,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
       <p style="font-size:0.75rem;color:#c87070;line-height:1.8;margin-bottom:0.8rem;">⚠ 以下の操作は取り消せません</p>
       <button class="btn btn-d" onclick="clearAllData()">全データを消去</button>
     </div>
-    <div class="options-section">
+    <div class="options-section" id="opt-db-section">
       <div class="options-section-title">世界観資料</div>
       <div id="db-current-info" style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:1rem;"></div>
       <button class="btn btn-p" onclick="loadDB()">📂 世界観資料を読み込む</button>
@@ -1061,6 +1082,19 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 </div>
 
 <!-- ══ モーダル ══ -->
+<!-- 汎用ダイアログ（alert/confirm代替） -->
+<div class="modal-overlay" id="modal-gm-dialog">
+  <div class="modal" style="max-width:360px;">
+    <div class="modal-title" id="gm-dialog-title"></div>
+    <div id="gm-dialog-msg" style="font-size:0.86rem;line-height:1.9;color:var(--ink);margin-bottom:0.4rem;white-space:pre-wrap;word-break:break-word;"></div>
+    <input type="text" id="gm-dialog-input" style="display:none;margin-top:0.6rem;" placeholder="">
+    <div class="btn-row" style="margin-top:1.2rem;justify-content:flex-end;">
+      <button id="gm-dialog-cancel" class="btn btn-g" onclick="gmDialogCancel()" style="display:none;">キャンセル</button>
+      <button id="gm-dialog-ok" class="btn btn-p" onclick="gmDialogOk()">OK</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-new-role">
   <div class="modal">
     <div class="modal-title">ロールを記録</div>
@@ -1085,13 +1119,13 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 <div class="modal-overlay" id="modal-api-setup">
   <div class="modal">
     <div class="modal-title">🔑 APIキー登録</div>
-    <p style="font-size:0.8rem;color:var(--ink-dim);line-height:1.9;margin-bottom:1.2rem;">分析機能はAnthropic社のAIサービスを使用します。</p>
-    <div class="modal-step"><div class="step-num">1</div><div class="step-text"><span class="step-link" onclick="window.open('https://console.anthropic.com','_blank')">こちら</span>を開きAnthropicアカウントを作成してください。</div></div>
-    <div class="modal-step"><div class="step-num">2</div><div class="step-text">「API Keys」→「Create Key」でAPIキーを発行してください。</div></div>
-    <div class="modal-step"><div class="step-num">3</div><div class="step-text">発行されたキー（"sk-ant-…"）を下の欄に貼り付けて登録してください。</div></div>
-    <div class="caution-box">⚠ APIの使用は従量制です（約0.1〜0.5円/回）。キーはこのブラウザにのみ保存されます。管理・費用はご自身の責任となります。</div>
+    <p style="font-size:0.8rem;color:var(--ink-dim);line-height:1.9;margin-bottom:1.2rem;">グリモワール機能（AI補助）はGoogle Gemini APIを使用します。</p>
+    <div class="modal-step"><div class="step-num">1</div><div class="step-text"><span class="step-link" onclick="window.open('https://aistudio.google.com/apikey','_blank')">こちら</span>を開きGoogleアカウントでサインインしてください。</div></div>
+    <div class="modal-step"><div class="step-num">2</div><div class="step-text">「APIキーを作成」からキーを発行してください。</div></div>
+    <div class="modal-step"><div class="step-num">3</div><div class="step-text">発行されたキー（「AIza…」から始まる文字列）を下の欄に貼り付けて登録してください。</div></div>
+    <div class="caution-box">⚠ APIの使用は従量制です（無料枠超過時）。キーはこのブラウザにのみ保存されます。管理・費用はご自身の責任となります。</div>
     <label class="fl" style="margin-top:0;">APIキー</label>
-    <input type="password" id="api-key-input" placeholder="sk-ant-…">
+    <input type="password" id="api-key-input" placeholder="AIza…">
     <div class="btn-row">
       <button class="btn btn-p" onclick="registerApiKey()">登録して解放</button>
       <button class="btn btn-g" onclick="closeModal('modal-api-setup')">キャンセル</button>
@@ -1110,7 +1144,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 <div class="modal-overlay" id="modal-mode-online">
   <div class="modal">
     <div class="modal-title">ONLINE モード</div>
-    <p style="font-size:0.82rem;color:var(--ink-dim);line-height:2;margin-bottom:1.2rem;">オンライン環境でBGM・SEを読み込みます。API接続後、AI（Claude）機能が利用可能になります。各自音声はメインページのオプションから調整が可能です。</p>
+    <p style="font-size:0.82rem;color:var(--ink-dim);line-height:2;margin-bottom:1.2rem;">オンライン環境でBGM・SEを読み込みます。API接続後、グリモワール機能（AI補助）が利用可能になります。各自音声はメインページのオプションから調整が可能です。</p>
     <div style="margin-bottom:1.2rem;">
       <label class="cb-wrap">
         <input type="checkbox" id="skip-online-confirm">
@@ -1128,7 +1162,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 <div class="modal-overlay" id="modal-mode-offline">
   <div class="modal">
     <div class="modal-title">OFFLINE モード</div>
-    <p style="font-size:0.82rem;color:var(--ink-dim);line-height:2;margin-bottom:1.2rem;">オフラインでGrimoireを続行します。AI（Claude）機能がご利用いただけません。オンラインへの切り替えはメインページのオプションから「タイトルへ戻る」で再ログインすることで可能です。</p>
+    <p style="font-size:0.82rem;color:var(--ink-dim);line-height:2;margin-bottom:1.2rem;">オフラインでGrimoireを続行します。グリモワール機能（AI補助）はご利用いただけません。オンラインへの切り替えはメインページのオプションから「タイトルへ戻る」で再ログインすることで可能です。</p>
     <div style="margin-bottom:1.2rem;">
       <label class="cb-wrap">
         <input type="checkbox" id="skip-offline-confirm">
@@ -1340,7 +1374,9 @@ const KEY_DB     = 'gm_worlddb';
 const KEY_ANN    = 'gm_announce_cache';
 const KEY_API    = 'gm_apikey';
 const KEY_OPTS   = 'gm_options';
+const KEY_LAST_EXPORT = 'gm_last_export';
 const GIST_URL   = '';
+const BACKUP_REMIND_DAYS = 30;
 
 const DEFAULT_CATS  = ['歴史・政治','魔法・術式','戦術・戦闘','キャラクター心理','世界観整合性'];
 const ASSIST_MODES  = [{id:'draft',name:'返しの草案生成'},{id:'skeleton',name:'構造提案'},{id:'emotion',name:'感情・動機の深掘り'},{id:'tension',name:'緊張感の設計'}];
@@ -1659,6 +1695,8 @@ function launchApp(){
   }
   renderCharList();
   showBagBtn();
+  // バックアップリマインダー（データがある場合のみ）
+  setTimeout(checkBackupReminder, 1500);
 }
 
 // ══ パーティクル ══
@@ -1790,7 +1828,7 @@ function openOptions(){
   document.getElementById('bgm-vol-label').textContent=options.bgmVol;
   // APIキーセクション
   const statusEl=document.getElementById('api-key-status');
-  if(statusEl) statusEl.textContent=apiKey?`登録済み（sk-ant-…${apiKey.slice(-4)}）`:'未登録';
+  if(statusEl) statusEl.textContent=apiKey?`登録済み（AIza…${apiKey.slice(-4)}）`:'未登録';
   const exportToggle=document.getElementById('opt-export-apikey');
   if(exportToggle) exportToggle.checked=options.exportApiKey;
   const warning=document.getElementById('apikey-export-warning');
@@ -1871,7 +1909,7 @@ async function sendChat(){
   const input=document.getElementById('chat-input');
   const text=input.value.trim();
   if(!text)return;
-  if(!apiKey){alert('APIキーが登録されていません');return;}
+  if(!apiKey){gmAlert('APIキーが登録されていません');return;}
   input.value='';
   appendChatBubble('user',text);
   chatHistory.push({role:'user',content:text});
@@ -1884,24 +1922,42 @@ async function sendChat(){
   let systemPrompt='あなたはロールプレイ支援AIです。ユーザーとの会話に自然に応答してください。';
   if(worldDB){
     systemPrompt+=`\n\n【世界観資料: ${worldDB.name||''}】\n`;
-    const cats=(worldDB.categories||[]).map(c=>c.name).join('・');
-    systemPrompt+=`カテゴリ: ${cats}`;
+    // 入力テキストに関連するエントリをキーワードマッチで最大4件抽出
+    const tokens=text.toLowerCase().replace(/[、。！？\s]+/g,' ').split(' ').filter(t=>t.length>=2);
+    const scored=(worldDB.entries||[]).map(e=>{
+      const target=(e.title+' '+(e.body||'')+' '+(e.tags||[]).join(' ')).toLowerCase();
+      const score=tokens.reduce((s,t)=>s+(target.includes(t)?1:0),0);
+      return {e,score};
+    }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,4);
+    if(scored.length){
+      systemPrompt+=`\n以下の関連資料を参考に回答してください:\n`;
+      scored.forEach(({e})=>{
+        const cat=(worldDB.categories||[]).find(c=>c.id===e.catId);
+        systemPrompt+=`\n■ ${e.title}${cat?' ('+cat.name+')':''}\n${(e.body||'').slice(0,400)}${(e.body||'').length>400?'…':''}\n`;
+      });
+    } else {
+      const cats=(worldDB.categories||[]).map(c=>c.name).join('・');
+      systemPrompt+=`カテゴリ: ${cats}`;
+    }
   }
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    // chatHistoryをGemini形式に変換（assistant→model）
+    const geminiContents=chatHistory.map(m=>({
+      role:m.role==='assistant'?'model':m.role,
+      parts:[{text:m.content}]
+    }));
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1024,
-        system:systemPrompt,
-        messages:chatHistory
+        system_instruction:{parts:[{text:systemPrompt}]},
+        contents:geminiContents
       })
     });
     if(!res.ok){const e=await res.json().catch(()=>{});throw new Error(e?.error?.message||`HTTP ${res.status}`);}
     const data=await res.json();
-    const reply=data.content?.map(c=>c.text||'').join('')||'';
+    const reply=data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'';
     chatHistory.push({role:'assistant',content:reply});
     removeChatBubble(loadingId);
     appendChatBubble('ai',reply);
@@ -1936,15 +1992,69 @@ function removeChatBubble(id){
 }
 function clearChat(){
   if(!chatHistory.length)return;
-  if(!confirm('会話履歴を消去しますか？'))return;
-  chatHistory=[];
-  document.getElementById('chat-messages').innerHTML='';
+  gmConfirm('会話履歴を消去しますか？',()=>{
+    chatHistory=[];
+    document.getElementById('chat-messages').innerHTML='';
+  });
 }
 
 // ══ モーダル ══
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// ── 汎用ダイアログ（alert / confirm 代替） ──
+let _gmOk=null, _gmCancel=null;
+function gmAlert(msg, title, onOk){
+  if(typeof title==='function'){onOk=title;title='';}
+  document.getElementById('gm-dialog-title').textContent=title||'';
+  document.getElementById('gm-dialog-title').style.display=title?'block':'none';
+  document.getElementById('gm-dialog-msg').textContent=msg;
+  document.getElementById('gm-dialog-ok').textContent='OK';
+  document.getElementById('gm-dialog-cancel').style.display='none';
+  document.getElementById('gm-dialog-input').style.display='none';
+  _gmOk=onOk||null; _gmCancel=null;
+  openModal('modal-gm-dialog');
+}
+function gmConfirm(msg, onYes, onNo, title, okLabel, cancelLabel){
+  document.getElementById('gm-dialog-title').textContent=title||'';
+  document.getElementById('gm-dialog-title').style.display=title?'block':'none';
+  document.getElementById('gm-dialog-msg').textContent=msg;
+  document.getElementById('gm-dialog-ok').textContent=okLabel||'確認';
+  const cancelBtn=document.getElementById('gm-dialog-cancel');
+  cancelBtn.style.display='';
+  cancelBtn.textContent=cancelLabel||'キャンセル';
+  document.getElementById('gm-dialog-input').style.display='none';
+  _gmOk=onYes||null; _gmCancel=onNo||null;
+  openModal('modal-gm-dialog');
+}
+function gmPrompt(msg, defaultVal, onOk, onCancel){
+  document.getElementById('gm-dialog-title').textContent='';
+  document.getElementById('gm-dialog-title').style.display='none';
+  document.getElementById('gm-dialog-msg').textContent=msg;
+  document.getElementById('gm-dialog-ok').textContent='OK';
+  const cancelBtn=document.getElementById('gm-dialog-cancel');
+  cancelBtn.style.display='';
+  cancelBtn.textContent='キャンセル';
+  const inp=document.getElementById('gm-dialog-input');
+  inp.style.display='';
+  inp.value=defaultVal||'';
+  setTimeout(()=>inp.focus(),80);
+  inp.onkeydown=e=>{if(e.key==='Enter')gmDialogOk();};
+  _gmOk=()=>{if(onOk)onOk(inp.value.trim());};
+  _gmCancel=onCancel||null;
+  openModal('modal-gm-dialog');
+}
+function gmDialogOk(){
+  closeModal('modal-gm-dialog');
+  document.getElementById('gm-dialog-input').style.display='none';
+  const cb=_gmOk;_gmOk=null;_gmCancel=null;if(cb)cb();
+}
+function gmDialogCancel(){
+  closeModal('modal-gm-dialog');
+  document.getElementById('gm-dialog-input').style.display='none';
+  const cb=_gmCancel;_gmOk=null;_gmCancel=null;if(cb)cb();
+}
 
 // ══ キャラクター管理 ══
 function showView(name){
@@ -2050,7 +2160,7 @@ function clearCharForm(){
   ['sf-sex','sf-race'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('sf-job-primary').value='';
   document.getElementById('sf-job-secondary').value='';
-  updateJobDisplay();
+  updateJobSelects();
   ['warn-age','warn-body'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='';});
   ['weapons','armors','items','magics'].forEach(id=>document.getElementById(`sf-${id}`).innerHTML='');
 }
@@ -2064,6 +2174,7 @@ function fillCharForm(c){
   if(unkCb){unkCb.checked=ageUnknown;document.getElementById('sf-age').disabled=ageUnknown;document.getElementById('sf-age').classList.toggle('locked',ageUnknown);}
   document.getElementById('sf-age').value=ageUnknown?'':c.age||'';
   document.getElementById('sf-job-primary').value=c.jobPrimary||'';
+  updateJobSelects(); // 一次確定後に二次選択肢を更新してから二次を設定
   document.getElementById('sf-job-secondary').value=c.jobSecondary||'';
   updateJobDisplay();
   checkAgeWarn();checkBodyWarn();
@@ -2111,16 +2222,47 @@ function getDynamicItems(type){
   }).filter(i=>i.name);
 }
 
+// 一次職と二次職の対応（一次職 → 除外する二次職のvalue）
+const JOB_EXCLUDE={
+  'ʀɪᴅᴇʀ':  ['ʀɪᴅᴇʀ'],          // ライダー一次 → ライダー二次除外
+  'ᴍᴀɢᴇ':   ['ᴇɴᴄʜᴀɴᴛᴇʀ'],      // メイジ → エンチャンター除外
+  'ᴡɪsʜᴇʀ': ['ᴏʀᴀᴄʟᴇ'],          // ウィッシャー → オラクル除外
+  'sʜᴀᴍᴀɴ': ['ᴄᴏɴᴊᴜʀᴇʀ'],        // シャーマン → コンジュラー除外
+  'sᴏʀᴄᴇʀᴇʀ':['ᴡᴀʀʟᴏᴄᴋ'],        // ソーサラー → ウォーロック除外
+  'ᴡɪᴢᴀʀᴅ': ['sᴀɢᴇ'],             // ウィザード → セージ除外
+};
 const JOB_INITIAL={
   'ʀɪᴅᴇʀ':'R',
   'ᴇɴᴄʜᴀɴᴛᴇʀ':'E','ᴏʀᴀᴄʟᴇ':'O',
   'ᴄᴏɴᴊᴜʀᴇʀ':'C','ᴡᴀʀʟᴏᴄᴋ':'W','sᴀɢᴇ':'S'
 };
+function updateJobSelects(){
+  const p=document.getElementById('sf-job-primary').value;
+  const sec=document.getElementById('sf-job-secondary');
+  const excluded=JOB_EXCLUDE[p]||[];
+  // 二次職の各optionを表示/非表示切り替え
+  Array.from(sec.options).forEach(opt=>{
+    if(!opt.value){return;} // 「未選択」は常に表示
+    opt.hidden=excluded.includes(opt.value);
+    opt.disabled=excluded.includes(opt.value);
+  });
+  // 現在の二次職選択が除外対象になった場合はリセット
+  if(excluded.includes(sec.value)) sec.value='';
+  // optgroupも空になるなら視覚的に整える（任意）
+  updateJobDisplay();
+}
 function buildJobValue(primary, secondary){
   if(!primary)return '';
   if(!secondary)return primary;
   const initial=JOB_INITIAL[secondary]||secondary.charAt(0);
   return primary+' - '+initial;
+}
+function updateJobDisplay(){
+  const p=document.getElementById('sf-job-primary').value;
+  const s=document.getElementById('sf-job-secondary').value;
+  const el=document.getElementById('sf-job-preview');
+  if(!el)return;
+  el.textContent=buildJobValue(p,s)||'';
 }
 function checkAgeWarn(){
   const el=document.getElementById('warn-age');if(!el)return;
@@ -2147,17 +2289,10 @@ function checkBodyWarn(){
   if(w&&w>180)warns.push('体重が上限（180kg）を超過しています');
   el.textContent=warns.length?'警告：'+warns.join(' / '):'';
 }
-function updateJobDisplay(){
-  const p=document.getElementById('sf-job-primary').value;
-  const s=document.getElementById('sf-job-secondary').value;
-  const el=document.getElementById('sf-job-preview');
-  if(!el)return;
-  el.textContent=buildJobValue(p,s)||'';
-}
 function saveChar(){
   const name=document.getElementById('sf-name').value.trim();
   const tag=document.getElementById('sf-tag').value.trim();
-  if(!name||!tag){alert('識別タグと名前は必須です');return;}
+  if(!name||!tag){gmAlert('識別タグと名前は必須です');return;}
   const c={
     id:editingCharId||'char_'+Date.now(),
     tag,name,
@@ -2326,22 +2461,37 @@ function roleCardHTML(r){
   return `<div class="role-card" id="rc-${r.id}"><div class="role-card-header"><span class="role-type-badge ${r.type==='opp'?'badge-opp':'badge-self'}">${r.type==='opp'?'相手':'自分'}</span><span class="role-session">${escHtml(r.session||'（セッション名なし）')}</span><span class="role-date">${date}</span></div><div class="role-preview">${escHtml(r.body)}</div>${tags}</div>`;
 }
 
+function sendToGrimoire(id){
+  const r=roles.find(r=>r.id===id); if(!r)return;
+  if(!isOnline){gmAlert('グリモワール機能はオンラインモードのみ使用できます');return;}
+  if(!apiKey){openModal('modal-api-setup');return;}
+  // 分析タブに転送
+  const targetTab=r.type==='opp'?'opp':'self';
+  const textEl=document.getElementById(`${targetTab}-text`);
+  if(textEl) textEl.value=r.body;
+  switchPage('analyze');
+  switchAnalyzeTab(targetTab);
+  // ボトムナビ更新
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bnav-analyze').classList.add('active');
+}
 function toggleRoleDetail(id){
   const ex=document.getElementById(`detail-${id}`);
   if(ex){ex.remove();document.getElementById(`rc-${id}`)?.classList.remove('selected');return;}
   document.getElementById(`rc-${id}`)?.classList.add('selected');
   const r=roles.find(r=>r.id===id); if(!r)return;
   const d=document.createElement('div'); d.className='detail-view'; d.id=`detail-${id}`;
-  d.innerHTML=`<div class="detail-header"><span class="role-type-badge ${r.type==='opp'?'badge-opp':'badge-self'}">${r.type==='opp'?'相手のロール':'自分のロール'}</span><span style="font-size:0.75rem;color:var(--ink-dim);">${escHtml(r.session||'')}</span><button class="btn btn-d btn-sm" style="margin-left:auto;" onclick="deleteRole('${id}')">削除</button></div><div class="detail-body">${escHtml(r.body)}</div>${r.memo?`<div class="detail-analysis"><div class="detail-analysis-label">メモ</div><div class="detail-analysis-text">${escHtml(r.memo)}</div></div>`:''}${r.analysis?`<div class="detail-analysis"><div class="detail-analysis-label">分析結果</div><div class="detail-analysis-text">${escHtml(r.analysis)}</div></div>`:''}`;
+  const analyzeBtn=apiKey&&isOnline?`<button class="btn btn-g btn-sm" style="margin-left:0.4rem;" onclick="event.stopPropagation();sendToGrimoire('${id}')">👁 分析</button>`:'';
+  d.innerHTML=`<div class="detail-header"><span class="role-type-badge ${r.type==='opp'?'badge-opp':'badge-self'}">${r.type==='opp'?'相手のロール':'自分のロール'}</span><span style="font-size:0.75rem;color:var(--ink-dim);">${escHtml(r.session||'')}</span><div style="margin-left:auto;display:flex;gap:0.3rem;">${analyzeBtn}<button class="btn btn-d btn-sm" onclick="event.stopPropagation();deleteRole('${id}')">削除</button></div></div><div class="detail-body">${escHtml(r.body)}</div>${r.memo?`<div class="detail-analysis"><div class="detail-analysis-label">メモ</div><div class="detail-analysis-text">${escHtml(r.memo)}</div></div>`:''}${r.analysis?`<div class="detail-analysis"><div class="detail-analysis-label">分析結果</div><div class="detail-analysis-text">${escHtml(r.analysis)}</div></div>`:''}`;
   document.getElementById(`rc-${id}`).after(d);
 }
 
 function filterSession(s){document.getElementById('role-search').value=s;renderRoles();}
 
 function saveRole(){
-  if(!currentCharId){alert('キャラクターを選択してください');return;}
+  if(!currentCharId){gmAlert('キャラクターを選択してください');return;}
   const body=document.getElementById('nr-body').value.trim();
-  if(!body){alert('ロール本文を入力してください');return;}
+  if(!body){gmAlert('ロール本文を入力してください');return;}
   const tagsRaw=document.getElementById('nr-tags').value.trim();
   roles.push({id:'r_'+Date.now(),charId:currentCharId,type:document.getElementById('nr-type').value,session:document.getElementById('nr-session').value.trim(),body,memo:document.getElementById('nr-memo').value.trim(),tags:tagsRaw?tagsRaw.split(',').map(t=>t.trim()).filter(Boolean):[],createdAt:Date.now()});
   localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
@@ -2351,13 +2501,14 @@ function saveRole(){
 }
 
 function deleteRole(id){
-  if(!confirm('このロールを削除しますか？'))return;
-  roles=roles.filter(r=>r.id!==id); localStorage.setItem(KEY_ROLES,JSON.stringify(roles)); renderRoles();
+  gmConfirm('このロールを削除しますか？',()=>{
+    roles=roles.filter(r=>r.id!==id); localStorage.setItem(KEY_ROLES,JSON.stringify(roles)); renderRoles();
+  });
 }
 
 // ══ データ管理 ══
 function copyApiKey(){
-  if(!apiKey){alert('APIキーが登録されていません');return;}
+  if(!apiKey){gmAlert('APIキーが登録されていません');return;}
   navigator.clipboard.writeText(apiKey).then(()=>{
     const btn=document.querySelector('#options-page .btn-g');
     if(btn){const o=btn.textContent;btn.textContent='✓ コピー済';setTimeout(()=>btn.textContent=o,1500);}
@@ -2371,6 +2522,8 @@ function onExportApiKeyToggle(){
 function exportData(){
   const data={exportedAt:new Date().toISOString(),characters,roles};
   if(options.exportApiKey&&apiKey) data.apiKey=apiKey;
+  localStorage.setItem(KEY_LAST_EXPORT, String(Date.now()));
+  dismissBackupReminder();
   downloadJSON(data,`grimoire_data_${Date.now()}.json`);
 }
 function importData(){
@@ -2381,34 +2534,44 @@ function importData(){
     reader.onload=ev=>{
       try{
         const data=JSON.parse(ev.target.result);
-        if(!confirm('データを読み込みます。既存データと統合しますか？'))return;
-        if(data.characters){const ex=new Set(characters.map(c=>c.id)); data.characters.forEach(c=>{if(!ex.has(c.id))characters.push(c);});}
-        if(data.roles){const ex=new Set(roles.map(r=>r.id)); data.roles.forEach(r=>{if(!ex.has(r.id))roles.push(r);});}
-        if(data.apiKey&&!apiKey){
-          if(confirm('ファイルにAPIキーが含まれています。復元しますか？')){
-            apiKey=data.apiKey; localStorage.setItem(KEY_API,apiKey); unlockAnalyze();
-          }
-        }
-        localStorage.setItem(KEY_CHARS,JSON.stringify(characters));
-        localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
-        renderCharList();
-        closeOptions();
-        alert('読み込みが完了しました');
-      }catch{alert('JSONの読み込みに失敗しました');}
+        gmConfirm('データを読み込みます。既存データと統合しますか？',()=>{
+          if(data.characters){const ex=new Set(characters.map(c=>c.id)); data.characters.forEach(c=>{if(!ex.has(c.id))characters.push(c);});}
+          if(data.roles){const ex=new Set(roles.map(r=>r.id)); data.roles.forEach(r=>{if(!ex.has(r.id))roles.push(r);});}
+          const doFinish=()=>{
+            localStorage.setItem(KEY_CHARS,JSON.stringify(characters));
+            localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
+            renderCharList();
+            closeOptions();
+            gmAlert('読み込みが完了しました');
+          };
+          if(data.apiKey&&!apiKey){
+            gmConfirm('ファイルにAPIキーが含まれています。復元しますか？',()=>{
+              apiKey=data.apiKey; localStorage.setItem(KEY_API,apiKey); unlockAnalyze();
+              doFinish();
+            },()=>doFinish());
+          } else { doFinish(); }
+        });
+      }catch{gmAlert('JSONの読み込みに失敗しました');}
     };
     reader.readAsText(file); input.value='';
   };
   input.click();
 }
 function clearAllData(){
-  if(!confirm('全データを消去しますか？取り消せません。'))return;
-  if(!confirm('本当に消去しますか？'))return;
-  characters=[]; roles=[];
-  localStorage.setItem(KEY_CHARS,JSON.stringify(characters)); localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
-  renderCharList();
+  gmConfirm('全データを消去しますか？\nこの操作は取り消せません。',()=>{
+    gmConfirm('本当に消去しますか？',()=>{
+      characters=[]; roles=[];
+      localStorage.setItem(KEY_CHARS,JSON.stringify(characters)); localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
+      renderCharList();
+    });
+  });
 }
 
 // ══ アーカイブ ══
+function filterDBByTag(tag){
+  const searchEl=document.getElementById('db-search');
+  if(searchEl){ searchEl.value=tag; renderDB(); }
+}
 function renderDB(){
   const q=(document.getElementById('db-search')?.value||'').toLowerCase();
   const catId=document.getElementById('db-cat-filter')?.value||'';
@@ -2422,8 +2585,11 @@ function renderDB(){
   area.innerHTML='';
   entries.forEach(entry=>{
     const cat=(worldDB.categories||[]).find(c=>c.id===entry.catId);
+    const tagsHtml=(entry.tags||[]).length
+      ?`<div class="role-tags" style="margin-top:0.55rem;">${(entry.tags).map(t=>`<span class="tag-chip" style="cursor:pointer;" onclick="event.stopPropagation();filterDBByTag('${escAttr(t)}')">${escHtml(t)}</span>`).join('')}</div>`
+      :'';
     const card=document.createElement('div'); card.className='db-entry-card';
-    card.innerHTML=`<div class="db-entry-title">${escHtml(entry.title)}</div><div class="db-entry-meta">${cat?escHtml(`${cat.icon||'📄'} ${cat.name}`):'未分類'}</div><div class="db-entry-body" id="dbeb-${entry.id}">${escHtml(entry.body)}</div>`;
+    card.innerHTML=`<div class="db-entry-title">${escHtml(entry.title)}</div><div class="db-entry-meta">${cat?escHtml(`${cat.icon||'📄'} ${cat.name}`):'未分類'}</div>${tagsHtml}<div class="db-entry-body" id="dbeb-${entry.id}">${escHtml(entry.body)}</div>`;
     card.onclick=()=>document.getElementById(`dbeb-${entry.id}`).classList.toggle('open');
     area.appendChild(card);
   });
@@ -2440,12 +2606,12 @@ function loadDB(){
     reader.onload=ev=>{
       try{
         const data=JSON.parse(ev.target.result);
-        if(!data.categories||!data.entries){alert('形式が正しくありません');return;}
+        if(!data.categories||!data.entries){gmAlert('形式が正しくありません');return;}
         worldDB=data; localStorage.setItem(KEY_DB,JSON.stringify(worldDB));
         populateDBCatFilter(); renderDB(); updateDBInfo();
         closeOptions();
-        alert(`${worldDB.name||'DB'} を読み込みました（記事${worldDB.entries.length}件）`);
-      }catch{alert('JSONの読み込みに失敗しました');}
+        gmAlert(`${worldDB.name||'DB'} を読み込みました（記事${worldDB.entries.length}件）`);
+      }catch{gmAlert('JSONの読み込みに失敗しました');}
     };
     reader.readAsText(file); input.value='';
   };
@@ -2548,28 +2714,26 @@ function openAnnounceModal(){
 // ══ 分析 ══
 async function registerApiKey(){
   const key=document.getElementById('api-key-input').value.trim();
-  if(!key.startsWith('sk-')){alert('正しいAPIキーを入力してください（sk- で始まる文字列）');return;}
+  if(!key.startsWith('AIza')){gmAlert('正しいAPIキーを入力してください（AIza で始まる文字列）');return;}
   const btn=document.querySelector('#modal-api-setup .btn-p');
   const orig=btn.textContent; btn.textContent='確認中…'; btn.disabled=true;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1,messages:[{role:'user',content:'hi'}]})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:'hi'}]}]})
     });
-    if(res.status===401){alert('APIキーが無効です。正しいキーを確認してください。');return;}
-    if(res.status===403){alert('このAPIキーには権限がありません。');return;}
-    // 200またはその他のエラーでも疎通できていれば有効とみなす（429=制限、500=サーバー等）
+    if(res.status===400||res.status===403){gmAlert('APIキーが無効です。正しいキーを確認してください。');return;}
     if(res.status===200||res.status===429||res.status>=500){
       apiKey=key;localStorage.setItem(KEY_API,apiKey);
       closeModal('modal-api-setup');unlockAnalyze();
-      alert('APIキーを確認しました。分析機能が解放されました。');
+      gmAlert('APIキーを確認しました。グリモワール機能（AI補助）が解放されました。');
     } else {
       const e=await res.json().catch(()=>{});
-      alert(`APIキーの確認に失敗しました（${res.status}）: ${e?.error?.message||''}`);
+      gmAlert(`APIキーの確認に失敗しました（${res.status}）: ${e?.error?.message||''}`);
     }
   }catch(e){
-    alert('ネットワークエラーが発生しました。接続を確認してください。');
+    gmAlert('ネットワークエラーが発生しました。接続を確認してください。');
   }finally{
     btn.textContent=orig; btn.disabled=false;
   }
@@ -2581,21 +2745,39 @@ function buildAssistModes(){const area=document.getElementById('assist-modes');A
 async function doAnalyze(mode){
   if(!apiKey){openModal('modal-api-setup');return;}
   const btn=document.getElementById(`${mode==='assist'?'assist':mode}-btn`), result=document.getElementById(`${mode==='assist'?'assist':mode}-result`);
-  const prompt=buildAnalyzePrompt(mode); if(!prompt){alert('本文を入力してください');return;}
+  const prompt=buildAnalyzePrompt(mode); if(!prompt){gmAlert('本文を入力してください');return;}
   btn.disabled=true; result.innerHTML=`<div style="padding:1.2rem;color:var(--ink-dim);font-size:0.8rem;">解析中…</div>`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}]})});
     if(!res.ok){const e=await res.json().catch(()=>{});throw new Error(e?.error?.message||`HTTP ${res.status}`);}
-    const data=await res.json(), text=data.content?.map(c=>c.text||'').join('')||'（応答なし）';
+    const data=await res.json(), text=data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'（応答なし）';
     result.innerHTML=`<div class="detail-analysis" style="margin-top:1rem;"><div class="detail-analysis-label">解析結果</div><div class="detail-analysis-text" id="ar-${mode}">${escHtml(text)}</div><div class="btn-row" style="margin-top:0.8rem;"><button class="btn btn-g btn-sm" onclick="copyText('ar-${mode}')">コピー</button></div></div>`;
   }catch(e){result.innerHTML=`<div style="color:#c87070;font-size:0.78rem;margin-top:0.8rem;padding:0.8rem;border:1px solid rgba(139,32,32,0.3);border-radius:2px;">エラー: ${escHtml(e.message)}</div>`;if(e.message.includes('401')){apiKey='';localStorage.removeItem(KEY_API);document.getElementById('analyze-locked').style.display='block';document.getElementById('analyze-unlocked').style.display='none';}}
   finally{btn.disabled=false;}
 }
 
+// 入力テキストに関連するエントリをキーワードマッチで抽出（共通ヘルパー）
+function getRelatedEntries(text, maxCount=4){
+  if(!worldDB||!text) return '';
+  const tokens=text.toLowerCase().replace(/[、。！？\s]+/g,' ').split(' ').filter(t=>t.length>=2);
+  if(!tokens.length) return '';
+  const scored=(worldDB.entries||[]).map(e=>{
+    const target=(e.title+' '+(e.body||'')+' '+(e.tags||[]).join(' ')).toLowerCase();
+    const score=tokens.reduce((s,t)=>s+(target.includes(t)?1:0),0);
+    return {e,score};
+  }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,maxCount);
+  if(!scored.length) return '';
+  let ref='\n\n【参照: 世界観資料】\n';
+  scored.forEach(({e})=>{
+    const cat=(worldDB.categories||[]).find(c=>c.id===e.catId);
+    ref+=`\n■ ${e.title}${cat?' ('+cat.name+')':''}\n${(e.body||'').slice(0,400)}${(e.body||'').length>400?'…':''}\n`;
+  });
+  return ref;
+}
 function buildAnalyzePrompt(mode){
-  if(mode==='opp'){const text=document.getElementById('opp-text').value.trim();if(!text)return null;const supp=document.getElementById('opp-supp').value.trim(),cats=[...checkedCats.opp];let p='あなたは中世ファンタジーのロールプレイセッションにおける世界観分析の専門家です。以下の相手プレイヤーのロール文を、指定された分析カテゴリの観点から詳細に分析してください。\n\n';if(supp)p+=`【世界観・設定補足】\n${supp}\n\n`;p+=`【相手のロール本文】\n${text}\n\n`;if(cats.length)p+=`【分析カテゴリ】\n${cats.join('、')}\n\n`;p+='各カテゴリについて、ロール文から読み取れる情報・含意・世界観的整合性・注目すべき要素を鋭く分析してください。';return p;}
-  if(mode==='self'){const text=document.getElementById('self-text').value.trim();if(!text)return null;const supp=document.getElementById('self-supp').value.trim(),cats=[...checkedCats.self];let p='あなたは中世ファンタジーのロールプレイセッションにおける世界観分析の専門家です。以下の自分のロール文を各カテゴリの観点から分析し、強みと課題を公平に評価してください。おべっかは不要です。\n\n';if(supp)p+=`【世界観・設定補足】\n${supp}\n\n`;p+=`【自分のロール本文】\n${text}\n\n`;if(cats.length)p+=`【分析カテゴリ】\n${cats.join('、')}\n\n`;p+='各カテゴリについて、世界観的な精度・表現の質・改善の余地を具体的に指摘してください。';return p;}
-  const ctx=document.getElementById('assist-ctx').value.trim();if(!ctx)return null;const chara=document.getElementById('assist-chara').value.trim(),modes=[...checkedModes].map(id=>ASSIST_MODES.find(m=>m.id===id)?.name).filter(Boolean);let p='あなたは中世ファンタジーのロールプレイセッションにおけるロール作成補助の専門家です。\n\n';if(chara)p+=`【自分のキャラクター情報】\n${chara}\n\n`;p+=`【現在の状況・文脈】\n${ctx}\n\n`;if(modes.length)p+=`【補助モード】\n${modes.join('、')}\n\n`;p+='各モードに応じた提案・草案を世界観と整合的な表現で具体的に提示してください。';return p;
+  if(mode==='opp'){const text=document.getElementById('opp-text').value.trim();if(!text)return null;const supp=document.getElementById('opp-supp').value.trim(),cats=[...checkedCats.opp];let p='あなたは中世ファンタジーのロールプレイセッションにおける世界観分析の専門家です。以下の相手プレイヤーのロール文を、指定された分析カテゴリの観点から詳細に分析してください。\n\n';if(supp)p+=`【世界観・設定補足】\n${supp}\n\n`;p+=`【相手のロール本文】\n${text}\n\n`;const rel=getRelatedEntries(text);if(rel)p+=rel+'\n\n';if(cats.length)p+=`【分析カテゴリ】\n${cats.join('、')}\n\n`;p+='各カテゴリについて、ロール文から読み取れる情報・含意・世界観的整合性・注目すべき要素を鋭く分析してください。';return p;}
+  if(mode==='self'){const text=document.getElementById('self-text').value.trim();if(!text)return null;const supp=document.getElementById('self-supp').value.trim(),cats=[...checkedCats.self];let p='あなたは中世ファンタジーのロールプレイセッションにおける世界観分析の専門家です。以下の自分のロール文を各カテゴリの観点から分析し、強みと課題を公平に評価してください。おべっかは不要です。\n\n';if(supp)p+=`【世界観・設定補足】\n${supp}\n\n`;p+=`【自分のロール本文】\n${text}\n\n`;const rel=getRelatedEntries(text);if(rel)p+=rel+'\n\n';if(cats.length)p+=`【分析カテゴリ】\n${cats.join('、')}\n\n`;p+='各カテゴリについて、世界観的な精度・表現の質・改善の余地を具体的に指摘してください。';return p;}
+  const ctx=document.getElementById('assist-ctx').value.trim();if(!ctx)return null;const chara=document.getElementById('assist-chara').value.trim(),modes=[...checkedModes].map(id=>ASSIST_MODES.find(m=>m.id===id)?.name).filter(Boolean);let p='あなたは中世ファンタジーのロールプレイセッションにおけるロール作成補助の専門家です。\n\n';if(chara)p+=`【自分のキャラクター情報】\n${chara}\n\n`;p+=`【現在の状況・文脈】\n${ctx}\n\n`;const rel=getRelatedEntries(ctx);if(rel)p+=rel+'\n\n';if(modes.length)p+=`【補助モード】\n${modes.join('、')}\n\n`;p+='各モードに応じた提案・草案を世界観と整合的な表現で具体的に提示してください。';return p;
 }
 
 // ══ ユーティリティ ══
@@ -2703,7 +2885,7 @@ function switchMemoTab(tab){
   document.getElementById('memo-tab-mind').classList.toggle('active',tab==='mind');
   if(tab==='mind')setTimeout(()=>{initMindmap();renderMindmap();},50);
 }
-function clearFlatMemo(){if(confirm('メモをクリアしますか？')){document.getElementById('memo-flat-text').value='';localStorage.removeItem(MEMO_KEY);}}
+function clearFlatMemo(){gmConfirm('メモをクリアしますか？',()=>{document.getElementById('memo-flat-text').value='';localStorage.removeItem(MEMO_KEY);});}
 function copyFlatMemo(){navigator.clipboard.writeText(document.getElementById('memo-flat-text').value).then(()=>{const b=document.querySelector('#memo-flat-panel .btn-g:last-child');const o=b.textContent;b.textContent='✓ コピー済';setTimeout(()=>b.textContent=o,1500);});}
 
 // ── マインドマップ ──
@@ -2860,41 +3042,44 @@ function mmPointerMove(e){
 }
 function mmPointerUp(){if(mmDragging){saveMindmap();}mmDragging=null;}
 function mmAddChild(){
-  if(!mmSelectedId){alert('ノードを選択してください');return;}
+  if(!mmSelectedId){gmAlert('ノードを選択してください');return;}
   const parent=mmNodes.find(n=>n.id===mmSelectedId);
-  const text=prompt('ノードのテキスト','');
-  if(!text)return;
-  const angle=Math.random()*Math.PI*2;
-  const dist=100+Math.random()*40;
-  const newNode={id:mmNextId++,x:parent.x+Math.cos(angle)*dist,y:parent.y+Math.sin(angle)*dist,text,size:34,color:'#b87333'};
-  mmNodes.push(newNode);
-  mmEdges.push({from:parent.id,to:newNode.id});
-  mmSelectedId=newNode.id;
-  mmUpdatePanel();
-  saveMindmap();renderMindmap();
+  gmPrompt('ノードのテキスト','',text=>{
+    if(!text)return;
+    const angle=Math.random()*Math.PI*2;
+    const dist=100+Math.random()*40;
+    const newNode={id:mmNextId++,x:parent.x+Math.cos(angle)*dist,y:parent.y+Math.sin(angle)*dist,text,size:34,color:'#b87333'};
+    mmNodes.push(newNode);
+    mmEdges.push({from:parent.id,to:newNode.id});
+    mmSelectedId=newNode.id;
+    mmUpdatePanel();
+    saveMindmap();renderMindmap();
+  });
 }
 function mmDeleteNode(){
   if(!mmSelectedId)return;
   const n=mmNodes.find(n=>n.id===mmSelectedId);
-  if(n?.root){alert('ルートノードは削除できません');return;}
-  if(!confirm('このノードを削除しますか？'))return;
-  mmNodes=mmNodes.filter(n=>n.id!==mmSelectedId);
-  mmEdges=mmEdges.filter(e=>e.from!==mmSelectedId&&e.to!==mmSelectedId);
-  mmSelectedId=null;mmUpdatePanel();saveMindmap();renderMindmap();
+  if(n?.root){gmAlert('ルートノードは削除できません');return;}
+  gmConfirm('このノードを削除しますか？',()=>{
+    mmNodes=mmNodes.filter(n=>n.id!==mmSelectedId);
+    mmEdges=mmEdges.filter(e=>e.from!==mmSelectedId&&e.to!==mmSelectedId);
+    mmSelectedId=null;mmUpdatePanel();saveMindmap();renderMindmap();
+  });
 }
 function mmEditNode(){
-  if(!mmSelectedId){alert('ノードを選択してください');return;}
+  if(!mmSelectedId){gmAlert('ノードを選択してください');return;}
   const n=mmNodes.find(n=>n.id===mmSelectedId);
-  const text=prompt('テキストを編集',n.text);
-  if(text===null)return;
-  n.text=text||n.text;saveMindmap();renderMindmap();
+  gmPrompt('テキストを編集',n.text,text=>{
+    n.text=text||n.text;saveMindmap();renderMindmap();
+  });
 }
 function mmClear(){
-  if(!confirm('マインドマップを全消去しますか？'))return;
-  const dpr=window.devicePixelRatio||1;
-  const w=mmCanvas.width/dpr,h=mmCanvas.height/dpr;
-  mmNodes=[{id:1,x:w/2,y:h/2,text:'中心',root:true,size:42,color:'#b87333'}];
-  mmEdges=[];mmNextId=2;mmSelectedId=null;mmUpdatePanel();saveMindmap();renderMindmap();
+  gmConfirm('マインドマップを全消去しますか？',()=>{
+    const dpr=window.devicePixelRatio||1;
+    const w=mmCanvas.width/dpr,h=mmCanvas.height/dpr;
+    mmNodes=[{id:1,x:w/2,y:h/2,text:'中心',root:true,size:42,color:'#b87333'}];
+    mmEdges=[];mmNextId=2;mmSelectedId=null;mmUpdatePanel();saveMindmap();renderMindmap();
+  });
 }
 
 // ── ダイス ──
@@ -2914,7 +3099,7 @@ function setDiceAnim(mode){
 }
 
 function rollDice(faces){
-  if(isNaN(faces)||faces<2){alert('正しい面数を入力してください');return;}
+  if(isNaN(faces)||faces<2){gmAlert('正しい面数を入力してください');return;}
   const result=Math.floor(Math.random()*faces)+1;
   const el=document.getElementById('dice-result');
 
@@ -2959,6 +3144,26 @@ function rollDice(faces){
 
 // ── カバンボタン表示 ──
 function showBagBtn(){document.getElementById('bag-btn').classList.add('visible');}
+
+// ── バックアップリマインダー ──
+function checkBackupReminder(){
+  if(!characters.length&&!roles.length) return; // データなし → 不要
+  const last=parseInt(localStorage.getItem(KEY_LAST_EXPORT)||'0');
+  const dismissed=parseInt(localStorage.getItem('gm_remind_dismissed')||'0');
+  const now=Date.now();
+  const days30=BACKUP_REMIND_DAYS*24*60*60*1000;
+  // 前回エクスポートが30日以上前 かつ「後で」を押してから7日以上経過
+  if((now-last)>days30 && (now-dismissed)>7*24*60*60*1000){
+    document.getElementById('backup-reminder').classList.add('visible');
+  }
+}
+function dismissBackupReminder(){
+  localStorage.setItem('gm_remind_dismissed', String(Date.now()));
+  const el=document.getElementById('backup-reminder');
+  el.style.opacity='0';
+  el.style.transition='opacity 0.4s';
+  setTimeout(()=>{el.classList.remove('visible');el.style.opacity='';el.style.transition='';},400);
+}
 
 // ══ 起動 ══
 (function init(){
