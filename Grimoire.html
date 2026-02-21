@@ -1969,7 +1969,7 @@ ${hasArchive
         parts:[{text:m.content}]
       }))
     ];
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:geminiContents})
@@ -2743,7 +2743,7 @@ async function registerApiKey(){
   const btn=document.querySelector('#modal-api-setup .btn-p');
   const orig=btn.textContent; btn.textContent='確認中…'; btn.disabled=true;
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`,{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${key}`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{role:'user',parts:[{text:'hi'}]}]})
@@ -2773,7 +2773,7 @@ async function doAnalyze(mode){
   const prompt=buildAnalyzePrompt(mode); if(!prompt){gmAlert('本文を入力してください');return;}
   btn.disabled=true; result.innerHTML=`<div style="padding:1.2rem;color:var(--ink-dim);font-size:0.8rem;">解析中…</div>`;
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}]})});
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}]})});
     if(!res.ok){const e=await res.json().catch(()=>{});throw new Error(e?.error?.message||`HTTP ${res.status}`);}
     const data=await res.json(), text=data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'（応答なし）';
     result.innerHTML=`<div class="detail-analysis" style="margin-top:1rem;"><div class="detail-analysis-label">解析結果</div><div class="detail-analysis-text" id="ar-${mode}">${escHtml(text)}</div><div class="btn-row" style="margin-top:0.8rem;"><button class="btn btn-g btn-sm" onclick="copyText('ar-${mode}')">コピー</button></div></div>`;
