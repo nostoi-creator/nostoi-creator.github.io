@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Nóstoi — Grimoire</title>
-<link rel="manifest" href="/manifest.json">
+
 <meta name="theme-color" content="#0e0c09">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,18 +23,12 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
-  background:#1a0a03;
-  background-image:
-    radial-gradient(ellipse at 50% 120%, rgba(255,95,5,0.45) 0%, rgba(200,65,5,0.25) 20%, rgba(120,40,5,0.1) 40%, transparent 60%),
-    radial-gradient(ellipse at 10% 110%, rgba(200,65,5,0.2) 0%, transparent 35%),
-    radial-gradient(ellipse at 90% 110%, rgba(200,65,5,0.2) 0%, transparent 35%),
-    radial-gradient(ellipse at 50% 50%, #2e1206 0%, #1a0a03 70%);
+  background:#000;
   color:var(--ink);font-family:var(--font-serif);min-height:100vh;font-size:14px;overflow:hidden;
   padding-bottom:calc(60px + env(safe-area-inset-bottom));}
 body.app-active{overflow-y:auto;}
 body.offline{
   background:#000;
-  background-image:none;
   /* テキスト系を寒色（水色・彩度30%減）に上書き */
   --ink:#c2cdd8;
   --ink-dim:#8898a8;
@@ -59,13 +53,55 @@ body.offline .lost-badge{
 body.offline .btn-d{border-color:rgba(128,80,200,0.6);color:#b088e8;}
 body.offline .btn-d:hover{background:rgba(100,60,180,0.4);color:#c8a8f8;}
 
-/* ── 背景画像レイヤー（将来用） ── */
+/* ── 背景画像レイヤー ── */
 #bg-image{
   position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url('https://nostoi-creator.github.io/background.png');
   background-size:cover;background-position:center;background-repeat:no-repeat;
-  opacity:1;transition:filter 1.2s;
+  filter:brightness(0.52);
+  animation:fire-flicker 6s ease-in-out infinite;
+  transition:filter 1.2s;
 }
-body.offline #bg-image{filter:brightness(0.5);}
+@keyframes fire-flicker{
+  0%   { filter:brightness(0.52); }
+  15%  { filter:brightness(0.56); }
+  28%  { filter:brightness(0.50); }
+  42%  { filter:brightness(0.58); }
+  55%  { filter:brightness(0.51); }
+  68%  { filter:brightness(0.55); }
+  80%  { filter:brightness(0.49); }
+  90%  { filter:brightness(0.54); }
+  100% { filter:brightness(0.52); }
+}
+body.offline #bg-image{
+  filter:brightness(0.3) saturate(0.7);
+  animation:none;
+}
+/* 上部暗化オーバーレイ */
+#bg-gradient{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(to bottom,
+      rgba(0,0,0,0.90) 0%,
+      rgba(0,0,0,0.78) 20%,
+      rgba(0,0,0,0.50) 38%,
+      rgba(0,0,0,0.10) 58%,
+      transparent 72%);
+  transition:opacity 1.2s;
+}
+body.offline #bg-gradient{opacity:0;}
+/* 下部をscreenブレンドで照らす炎レイヤー（高輝度・画像に輝度を与える） */
+#bg-light{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(ellipse at 50% 105%, rgba(255,180,80,0.7) 0%, rgba(240,110,20,0.4) 14%, rgba(200,60,0,0.15) 30%, transparent 50%),
+    radial-gradient(ellipse at 18% 108%, rgba(240,140,30,0.35) 0%, rgba(180,60,0,0.1) 18%, transparent 35%),
+    radial-gradient(ellipse at 82% 108%, rgba(240,140,30,0.35) 0%, rgba(180,60,0,0.1) 18%, transparent 35%),
+    linear-gradient(to top, rgba(220,100,20,0.15) 0%, rgba(180,60,0,0.05) 20%, transparent 36%);
+  mix-blend-mode:screen;
+  transition:opacity 1.2s;
+}
+body.offline #bg-light{opacity:0;}
 
 /* ── Canvas ── */
 #particle-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0;transition:opacity 1s;}
@@ -73,10 +109,10 @@ body.offline #bg-image{filter:brightness(0.5);}
 #offline-overlay{
   position:fixed;inset:0;pointer-events:none;z-index:1;
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(30,70,160,0.22) 0%, transparent 70%),
-    radial-gradient(ellipse at 0% 60%,  rgba(15,45,110,0.18) 0%, transparent 55%),
-    radial-gradient(ellipse at 100% 60%,rgba(15,45,110,0.18) 0%, transparent 55%),
-    rgba(5,15,40,0.45);
+    radial-gradient(ellipse at 50% 30%, rgba(30,70,160,0.176) 0%, transparent 70%),
+    radial-gradient(ellipse at 0% 60%,  rgba(15,45,110,0.144) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 60%,rgba(15,45,110,0.144) 0%, transparent 55%),
+    rgba(5,15,40,0.36);
   opacity:0;transition:opacity 1.2s;
 }
 #offline-overlay.visible{opacity:1;}
@@ -87,8 +123,20 @@ body.offline #bg-image{filter:brightness(0.5);}
   transition:opacity 0.8s;
   background:#000;
   overflow:hidden;
+  opacity:0; /* JS で fade-in */
 }
 #title-screen.fade-out{opacity:0;pointer-events:none;}
+#title-screen.fade-in{opacity:1;}
+@keyframes titleRise{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@keyframes titleFadeIn{from{opacity:0;}to{opacity:1;}}
+.title-nostoi{opacity:0;}
+.title-grimoire{opacity:0;}
+.title-sub-jp{opacity:0;}
+#title-btn-container{opacity:0;}
+.title-nostoi.reveal{animation:titleRise 1.0s cubic-bezier(0.22,1,0.36,1) forwards;}
+.title-grimoire.reveal{animation:titleRise 0.9s cubic-bezier(0.22,1,0.36,1) forwards;}
+.title-sub-jp.reveal{animation:titleFadeIn 0.8s ease forwards;}
+#title-btn-container.reveal{animation:titleFadeIn 0.8s ease forwards;}
 /* タイトル画面表示中はbodyスクロール禁止 */
 body.title-active{overflow:hidden;}
 .title-nostoi{
@@ -121,6 +169,25 @@ body.title-active{overflow:hidden;}
 .mode-btn{background:rgba(14,12,9,0.72);border:1px solid var(--border-hi);color:var(--parchment);font-family:var(--font-display);font-size:clamp(0.8rem,2.2vw,1rem);letter-spacing:0.5em;text-transform:uppercase;padding:0.75rem 2.5rem;cursor:pointer;transition:all 0.25s;width:240px;text-align:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
 .mode-btn:hover{border-color:var(--accent);color:var(--parchment);background:rgba(184,115,51,0.18);box-shadow:0 0 16px rgba(184,115,51,0.2);}
 #title-loading{display:none;position:absolute;bottom:-2.5rem;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:0.7rem;letter-spacing:0.3em;color:var(--parchment-dk);text-transform:uppercase;animation:blink 1.2s ease-in-out infinite;}
+
+/* ── 共有写本 ── */
+.shared-story-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:0.7rem 1rem;margin-bottom:0.4rem;cursor:pointer;transition:background 0.12s;display:flex;align-items:center;gap:0.8rem;}
+.shared-story-card:hover{background:var(--bg3);}
+.shared-story-card.finished-card{border-color:rgba(184,115,51,0.4);background:linear-gradient(135deg,rgba(46,18,6,0.5),rgba(30,12,4,0.85));}
+.shared-story-card-info{flex:1;min-width:0;}
+.shared-story-card-title{font-size:0.9rem;color:var(--parchment);font-family:var(--font-serif);margin-bottom:0.15rem;}
+.shared-story-card-meta{font-size:0.68rem;color:var(--parchment-dk);letter-spacing:0.05em;}
+.shared-story-card-seal{flex-shrink:0;opacity:0.85;}
+/* ビューア本文 */
+#viewer-body p{text-indent:1em;margin:0;}
+#viewer-body p.scene{text-align:center;text-indent:0;letter-spacing:.5em;margin:1em 0;}
+#viewer-body h1.pt{font-size:1.3rem;text-align:center;text-indent:0;margin:2em 0 1.5em;font-weight:700;letter-spacing:.2em;color:var(--parchment);}
+#viewer-body h2.ch{font-size:1.05rem;text-indent:0;margin:2em 0 1em;font-weight:700;border-bottom:1px solid var(--border-hi);padding-bottom:.3em;color:var(--parchment);}
+#viewer-body h3.sc{font-size:0.95rem;text-indent:0;margin:1.5em 0 .8em;font-weight:700;color:var(--parchment-dk);}
+#viewer-body .pb{margin:2em 0;text-align:center;color:var(--parchment-dk);font-size:0.7rem;letter-spacing:.5em;}
+#viewer-body ruby rt{font-size:.55em;color:var(--parchment-dk);}
+#viewer-body.vertical{writing-mode:vertical-rl;text-orientation:upright;max-height:70vh;overflow-x:auto;overflow-y:hidden;padding:0.5rem;}
+#viewer-body.vertical p,#viewer-body.vertical h1,#viewer-body.vertical h2,#viewer-body.vertical h3{text-indent:0;}
 
 /* ══ アプリ ══ */
 #app{display:none;opacity:0;transition:opacity 0.6s;position:relative;z-index:1;}
@@ -231,6 +298,58 @@ select option{background:var(--bg2);}
 .role-date{font-size:0.65rem;color:var(--parchment-dk);margin-left:auto;}
 .role-preview{font-size:0.8rem;color:var(--ink-dim);line-height:1.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .role-tags{display:flex;gap:0.3rem;flex-wrap:wrap;margin-top:0.5rem;}
+.session-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:0.85rem 1rem;margin-bottom:0.5rem;cursor:pointer;display:flex;align-items:center;gap:0.7rem;transition:all 0.15s;}
+.session-card:hover{border-color:var(--border-hi);background:var(--bg3);}
+.session-card-name{flex:1;font-size:0.88rem;color:var(--parchment);letter-spacing:0.05em;}
+.session-card-count{font-size:0.65rem;color:var(--parchment-dk);}
+.role-order-btn{background:none;border:1px solid var(--border);color:var(--ink-dim);width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:2px;font-size:0.75rem;transition:all 0.1s;flex-shrink:0;padding:0;}
+.role-order-btn:hover{border-color:var(--border-hi);color:var(--ink);}
+.role-order-btn:disabled{opacity:0.22;cursor:default;pointer-events:none;}
+/* ── ストーリー ── */
+.story-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:0.85rem 1rem;margin-bottom:0.5rem;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden;}
+.story-card:hover{border-color:var(--border-hi);background:var(--bg3);}
+.story-card-title{font-size:0.9rem;color:var(--parchment);letter-spacing:0.05em;margin-bottom:0.25rem;}
+.story-card-meta{font-size:0.65rem;color:var(--parchment-dk);}
+/* 完成ストーリーの装丁 */
+.story-card.finished{border-color:rgba(184,115,51,0.55);background:linear-gradient(135deg,rgba(46,18,6,0.6) 0%,rgba(30,12,4,0.9) 100%);}
+.story-card.finished:hover{border-color:var(--accent);}
+.story-card.finished .story-card-title{color:var(--accent);}
+/* 上下の装飾罫線 */
+.story-card.finished::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--accent) 20%,rgba(200,160,80,0.9) 50%,var(--accent) 80%,transparent 100%);}
+.story-card.finished::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(184,115,51,0.4) 30%,rgba(184,115,51,0.4) 70%,transparent 100%);}
+.story-finished-label{font-size:0.58rem;letter-spacing:0.25em;color:rgba(200,160,80,0.85);text-transform:uppercase;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem;}
+.story-finished-label::before,.story-finished-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(184,115,51,0.5));}
+.story-finished-label::after{transform:scaleX(-1);}
+.story-seal{font-size:0.6rem;color:rgba(184,115,51,0.6);letter-spacing:0.1em;margin-top:0.35rem;font-style:italic;}
+/* ── ストーリーエディタ ── */
+.story-toolbar{display:flex;flex-wrap:wrap;gap:0.3rem;padding:0.4rem 0.5rem;background:var(--bg2);border:1px solid var(--border);border-bottom:none;border-radius:2px 2px 0 0;}
+.story-tb-btn{background:none;border:1px solid var(--border);color:var(--ink-dim);font-family:var(--font-serif);font-size:0.7rem;letter-spacing:0.1em;padding:0.25rem 0.55rem;cursor:pointer;border-radius:2px;transition:all 0.1s;white-space:nowrap;}
+.story-tb-btn:hover{border-color:var(--border-hi);color:var(--ink);}
+.story-tb-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(184,115,51,0.08);}
+#story-body{border-radius:0 0 2px 2px;}
+.story-stats-bar{display:flex;align-items:center;gap:1rem;padding:0.45rem 1rem;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
+.story-stat{display:flex;align-items:baseline;gap:0.3rem;font-size:0.82rem;color:var(--ink);}
+.story-stat-label{font-size:0.6rem;letter-spacing:0.15em;color:var(--parchment-dk);text-transform:uppercase;}
+#story-fullscreen{display:none;}
+#story-fullscreen.open{display:flex;}
+.story-body-vertical{writing-mode:vertical-rl;text-orientation:upright;}
+
+.story-char-chip{display:inline-flex;align-items:center;gap:0.25rem;font-size:0.62rem;padding:0.1rem 0.5rem;background:rgba(184,115,51,0.1);border:1px solid var(--border);color:var(--parchment-dim);border-radius:1px;cursor:pointer;margin:0.15rem 0.15rem 0 0;}
+.story-char-chip:hover{border-color:var(--border-hi);}
+.seal-part-row{display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.7rem;}
+.seal-color-row{display:flex;flex-wrap:wrap;gap:0.3rem;margin:0 0 0.7rem;align-items:center;}
+.seal-cswatch{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:border-color 0.15s,transform 0.12s;padding:0;flex-shrink:0;}
+.seal-cswatch.selected{border-color:var(--accent);transform:scale(1.18);}
+.seal-cswatch:hover:not(.selected){transform:scale(1.1);}
+.seal-custom-color{width:28px;height:22px;border:1px solid var(--border);border-radius:2px;background:transparent;cursor:pointer;padding:0;flex-shrink:0;}
+.seal-part-btn{width:50px;height:50px;border:1px solid var(--border);border-radius:2px;background:var(--bg3);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all 0.12s;padding:2px;flex-shrink:0;}
+.seal-part-btn:hover{border-color:var(--border-hi);background:var(--bg2);}
+.seal-part-btn.selected{border-color:var(--accent);background:rgba(184,115,51,0.1);}
+.seal-part-btn svg{width:36px;height:36px;display:block;}
+.seal-part-label{font-size:0.5rem;color:var(--parchment-dk);text-align:center;letter-spacing:0.05em;line-height:1;margin-top:1px;}
+.seal-preview-wrap{display:flex;justify-content:center;margin-bottom:1.2rem;}
+.seal-preview-box{width:110px;height:110px;border:1px solid var(--border-hi);border-radius:2px;background:var(--bg3);display:flex;align-items:center;justify-content:center;}
+
 .tag-chip{font-size:0.62rem;padding:0.1rem 0.4rem;background:rgba(184,115,51,0.1);border:1px solid var(--border);color:var(--parchment-dim);border-radius:1px;}
 .detail-view{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:1.2rem;margin-top:0.8rem;animation:fadeIn 0.25s ease;}
 .detail-header{display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border);}
@@ -351,12 +470,15 @@ input[type="range"]{width:100%;height:3px;-webkit-appearance:none;background:lin
 input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--parchment);border-radius:50%;border:1px solid var(--accent);}
 
 /* ── カバンポップ ── */
-#bag-btn{position:fixed;right:1rem;bottom:calc(72px + env(safe-area-inset-bottom));z-index:60;width:46px;height:46px;background:var(--bg2);border:1px solid var(--border-hi);border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:1.2rem;box-shadow:0 2px 12px rgba(0,0,0,0.5);transition:all 0.2s;}
+#bag-btn{position:fixed;right:1rem;bottom:calc(72px + env(safe-area-inset-bottom));z-index:60;width:46px;height:46px;background:var(--bg2);border:1px solid var(--border-hi);border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:1.2rem;box-shadow:0 2px 12px rgba(0,0,0,0.5);transition:right 0.25s ease, left 0.25s ease, bottom 0.25s ease, top 0.25s ease;}
 #bag-btn.visible{display:flex;}
 #bag-btn:hover{border-color:var(--accent);box-shadow:0 2px 16px var(--accent-glow);}
 #bag-btn.open{background:var(--accent);border-color:var(--accent);}
+#bag-btn.chat-mode{bottom:auto;top:calc(52px + env(safe-area-inset-top) + 0.4rem);right:0.8rem;}
 #bag-menu{position:fixed;right:1rem;bottom:calc(126px + env(safe-area-inset-bottom));z-index:60;display:flex;flex-direction:column;gap:0.4rem;align-items:flex-end;pointer-events:none;opacity:0;transform:translateY(8px);transition:all 0.2s;}
 #bag-menu.open{pointer-events:all;opacity:1;transform:translateY(0);}
+#bag-menu.chat-mode{bottom:auto;top:calc(52px + env(safe-area-inset-top) + 0.4rem + 54px);right:0.8rem;align-items:flex-end;transform:translateY(-8px);}
+#bag-menu.chat-mode.open{transform:translateY(0);}
 .bag-menu-item{background:var(--bg2);border:1px solid var(--border-hi);border-radius:2px;padding:0.4rem 0.8rem;font-size:0.75rem;letter-spacing:0.1em;color:var(--parchment);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:0.5rem;transition:all 0.15s;}
 .bag-menu-item:hover{border-color:var(--accent);color:var(--accent);}
 /* カバンモーダル */
@@ -441,7 +563,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 .chat-bubble.ai.loading{color:var(--parchment-dk);font-style:italic;}
 .chat-sender{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.3rem;color:var(--parchment-dk);}
 #apanel-chat.active-panel{display:flex;}
-.page{backface-visibility:hidden;transform-style:preserve-3d;}
+.page{backface-visibility:hidden;}
 .page.flip-out{animation:flipOut 0.22s ease-in forwards;}
 .page.flip-in {animation:flipIn  0.22s ease-out forwards;}
 @keyframes flipOut{
@@ -503,6 +625,8 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 </head>
 <body>
 <div id="bg-image"></div>
+<div id="bg-gradient"></div>
+<div id="bg-light"></div>
 <canvas id="particle-canvas"></canvas>
 <div id="offline-overlay"></div>
 
@@ -538,7 +662,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
   <!-- ── バックアップリマインダー ── -->
   <div id="backup-reminder">
     <div class="backup-reminder-inner">
-      <span class="backup-reminder-text">⚠ <strong>データのバックアップをお勧めします。</strong>前回のエクスポートから30日以上経過しています</span>
+      <span class="backup-reminder-text">⚠ <strong>バックアップをお勧めします。</strong>キャラ・ストーリーを含む全データのエクスポートから30日以上経過しています</span>
       <div class="backup-reminder-btns">
         <button class="btn btn-p btn-sm" onclick="exportData()">今すぐ保存</button>
         <button class="btn btn-g btn-sm" onclick="dismissBackupReminder()">後で</button>
@@ -554,20 +678,205 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
       <div class="search-bar">
         <input type="text" id="char-search" placeholder="キャラクターを検索…" oninput="renderCharList()">
       </div>
-      <div class="btn-row" style="margin-top:0;">
+      <div class="btn-row" style="margin-top:0;gap:0.5rem;">
         <button class="btn btn-p" onclick="showCharCreate()">＋ キャラクターを作成</button>
+        <button class="btn btn-g" onclick="showStoryCreate()">＋ ストーリー作成</button>
       </div>
-      <div id="char-list" style="margin-top:1rem;"></div>
+      <div class="sec-label" style="margin-top:1.2rem;">キャラクター</div>
+      <div id="char-list"></div>
+      <div class="sec-label" style="margin-top:1.2rem;">ストーリー</div>
+      <div id="story-list"></div>
     </div>
 
-    <!-- キャラクター詳細ビュー -->
+    <!-- ストーリー作成・編集ビュー -->
+    <div id="story-edit-view" style="display:none;">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
+        <button class="btn btn-g btn-sm" onclick="backFromStory()">← 一覧</button>
+        <span style="font-size:0.85rem;color:var(--parchment);letter-spacing:0.1em;flex:1;">ストーリー</span>
+      </div>
+      <label class="fl" style="margin-top:0;">タイトル <span style="color:var(--accent);">*</span></label>
+      <input type="text" id="story-title" placeholder="タイトルを入力…">
+
+      <!-- 本文エディタ -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1rem;margin-bottom:0.4rem;">
+        <span class="sec-label" style="margin:0;">本文</span>
+        <button class="btn btn-g btn-sm" onclick="toggleStoryFullscreen()" id="story-fs-btn" style="font-size:0.68rem;letter-spacing:0.1em;">全画面</button>
+      </div>
+      <!-- ツールバー -->
+      <div class="story-toolbar" id="story-toolbar">
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="insertIndent()" title="字下げ">字下げ</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="openRubyModal()" title="ルビ振り">ルビ</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="insertPageBreak()" title="改ページ">改頁</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" id="story-vert-btn" onclick="toggleVertical()" title="縦書き切替">横書き</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="insertTitle()" title="タイトル挿入">題</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="insertChapter()" title="章・節挿入">章</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="openStorySearch()" title="検索・置換">検索</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="toggleOutline()" title="章アウトライン" id="story-outline-btn">目次</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="openTermManager()" title="用語管理">用語</button>
+      </div>
+      <!-- 章アウトライン（折りたたみ） -->
+      <div id="story-outline-panel" style="display:none;background:var(--bg2);border:1px solid var(--border);border-top:none;padding:0.5rem 0.7rem;max-height:160px;overflow-y:auto;"></div>
+      <textarea id="story-body" rows="12" placeholder="ここに本文を書きます…" style="font-size:0.88rem;line-height:2.1;" oninput="onStoryBodyInput()" spellcheck="false"></textarea>
+      <!-- 統計（通常モード） -->
+      <div class="story-stats-bar" style="border-top:1px solid var(--border);border-bottom:none;border-radius:0 0 2px 2px;background:var(--bg2);">
+        <span class="story-stat"><span class="story-stat-label">文字</span><span id="nm-chars">0</span></span>
+        <span class="story-stat"><span class="story-stat-label">空白</span><span id="nm-spaces">0</span></span>
+        <span class="story-stat"><span class="story-stat-label">改行</span><span id="nm-lines">0</span></span>
+        <span class="story-stat">
+          <span class="story-stat-label">換算</span>
+          <select id="nm-page-unit" onchange="updateStoryStats()" style="background:transparent;border:none;color:var(--ink-dim);font-size:0.7rem;padding:0;" onmousedown="event.stopPropagation()">
+            <option value="400">400字</option>
+            <option value="200">200字</option>
+            <option value="800">800字</option>
+          </select>
+          <span id="nm-pages">0</span>枚
+        </span>
+      </div>
+      <!-- 用語ゆれ警告 -->
+      <div id="story-term-warn" style="display:none;margin-top:0.4rem;padding:0.5rem 0.7rem;background:rgba(180,60,0,0.1);border:1px solid rgba(180,60,0,0.3);border-radius:2px;font-size:0.72rem;color:var(--parchment-dk);line-height:1.8;"></div>
+
+      <div class="sec-label" style="margin-top:1rem;">登場キャラクター</div>
+      <div id="story-char-list" style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.5rem;"></div>
+      <button class="btn btn-g btn-sm" onclick="openStoryCharPicker()">＋ キャラクターを登録</button>
+      <div class="sec-label" style="margin-top:1rem;">セッション引用</div>
+      <div id="story-session-list" style="margin-bottom:0.5rem;"></div>
+      <button class="btn btn-g btn-sm" onclick="openSessionPicker()">＋ セッションを読み込む</button>
+      <div style="margin-top:1.5rem;border-top:1px solid var(--border);padding-top:1rem;display:flex;flex-wrap:wrap;gap:0.5rem;">
+        <button class="btn btn-g btn-sm" onclick="saveStoryJSON()">中途保存</button>
+        <button class="btn btn-g btn-sm" onclick="exportStoryPDF()">PDF出力</button>
+        <button class="btn btn-p btn-sm" onclick="goColophon()">奥付に移る →</button>
+      </div>
+    </div>
+
+    <!-- 全画面エディタ -->
+    <div id="story-fullscreen" style="position:fixed;inset:0;z-index:200;background:var(--bg);flex-direction:column;">
+      <!-- 統計バー -->
+      <div class="story-stats-bar" id="story-stats-bar">
+        <span class="story-stat"><span class="story-stat-label">文字</span><span id="fs-chars">0</span></span>
+        <span class="story-stat"><span class="story-stat-label">空白</span><span id="fs-spaces">0</span></span>
+        <span class="story-stat"><span class="story-stat-label">改行</span><span id="fs-lines">0</span></span>
+        <span class="story-stat"><span class="story-stat-label">頁</span><span id="fs-pages">0</span></span>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" style="margin-left:auto;" onclick="toggleStoryFullscreen()">縮小</button>
+      </div>
+      <!-- ツールバー -->
+      <div class="story-toolbar" id="story-toolbar-fs">
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="insertIndent()" title="字下げ">字下げ</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="openRubyModal()" title="ルビ振り">ルビ</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="insertPageBreak()" title="改ページ">改頁</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" id="story-vert-btn-fs" onclick="toggleVertical()" title="縦書き切替">横書き</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="insertTitle()" title="タイトル挿入">題</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="insertChapter()" title="章・節挿入">章</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="openStorySearch()" title="検索・置換">検索</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="toggleOutline()" title="章アウトライン">目次</button>
+        <button class="story-tb-btn" onmousedown="event.preventDefault()" onclick="openTermManager()" title="用語管理">用語</button>
+      </div>
+      <!-- 全画面テキストエリア -->
+      <textarea id="story-body-fs" style="flex:1;resize:none;background:transparent;border:none;outline:none;padding:1rem 1.2rem;font-size:0.92rem;line-height:2.2;color:var(--ink);font-family:var(--font-serif);" placeholder="ここに本文を書きます…" oninput="onFsBodyInput()" spellcheck="false"></textarea>
+      <div id="story-term-warn-fs" style="display:none;margin:0.3rem 0.5rem 0;padding:0.4rem 0.7rem;background:rgba(180,60,0,0.1);border:1px solid rgba(180,60,0,0.3);border-radius:2px;font-size:0.7rem;color:var(--parchment-dk);line-height:1.8;flex-shrink:0;"></div>
+    </div>
+
+    <!-- ルビ入力モーダル -->
+    <div class="modal-overlay" id="modal-ruby">
+      <div class="modal">
+        <div class="modal-title">ルビ振り</div>
+        <p style="font-size:0.78rem;color:var(--ink-dim);line-height:1.8;margin-bottom:0.8rem;">直接 <code style="background:var(--bg3);padding:0.1em 0.4em;border-radius:2px;">｜漢字《かんじ》</code> と入力することも可能です。</p>
+        <label class="fl" style="margin-top:0;">対象テキスト</label>
+        <input type="text" id="ruby-base" placeholder="例：薔薇">
+        <label class="fl">ルビ（読み）</label>
+        <input type="text" id="ruby-text" placeholder="例：ばら">
+        <div class="btn-row">
+          <button class="btn btn-p" onclick="insertRuby()">挿入</button>
+          <button class="btn btn-g" onclick="closeModal('modal-ruby')">キャンセル</button>
+        </div>
+      </div>
+    </div>
+    <!-- 検索・置換モーダル -->
+    <div class="modal-overlay" id="modal-story-search">
+      <div class="modal">
+        <div class="modal-title">検索・置換</div>
+        <label class="fl" style="margin-top:0;">検索</label>
+        <input type="text" id="search-find" placeholder="検索する文字列">
+        <label class="fl">置換後</label>
+        <input type="text" id="search-replace" placeholder="置換する文字列（空欄で削除）">
+        <div id="search-result-info" style="font-size:0.72rem;color:var(--parchment-dk);min-height:1.2em;margin-top:0.4rem;"></div>
+        <div class="btn-row">
+          <button class="btn btn-g btn-sm" onclick="storySearchFind()">検索</button>
+          <button class="btn btn-g btn-sm" onclick="storySearchReplace()">この箇所を置換</button>
+          <button class="btn btn-p btn-sm" onclick="storySearchReplaceAll()">全て置換</button>
+          <button class="btn btn-g" onclick="closeModal('modal-story-search')">閉じる</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 用語管理モーダル -->
+    <div class="modal-overlay" id="modal-term-manager">
+      <div class="modal">
+        <div class="modal-title">用語・表記ゆれ管理</div>
+        <p style="font-size:0.75rem;color:var(--ink-dim);line-height:1.8;margin-bottom:0.8rem;">登録した正式表記と異なる表記が本文に存在する場合に警告します。</p>
+        <div id="term-list" style="max-height:200px;overflow-y:auto;margin-bottom:0.8rem;"></div>
+        <div style="display:flex;gap:0.4rem;align-items:flex-end;">
+          <div style="flex:1;">
+            <label class="fl" style="margin-top:0;">正式表記</label>
+            <input type="text" id="term-correct" placeholder="例：ノストイ">
+          </div>
+          <div style="flex:1;">
+            <label class="fl" style="margin-top:0;">揺れ表記（カンマ区切り）</label>
+            <input type="text" id="term-variants" placeholder="例：ノストイ,nostoi">
+          </div>
+          <button class="btn btn-p btn-sm" style="flex-shrink:0;margin-bottom:0;" onclick="addTerm()">追加</button>
+        </div>
+        <div class="btn-row" style="margin-top:1rem;">
+          <button class="btn btn-g" onclick="closeModal('modal-term-manager')">閉じる</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 写本作成（奥付）ビュー -->
+    <div id="story-colophon-view" style="display:none;">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.2rem;">
+        <button class="btn btn-g btn-sm" onclick="backFromColophon()">← 戻る</button>
+        <span style="font-size:0.85rem;color:var(--parchment);letter-spacing:0.15em;">写本作成</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <label class="cb-wrap">
+          <input type="checkbox" id="col-use-date" checked onchange="updateColophonPreview()">
+          <span class="cb-box"></span>
+          <span style="font-size:0.82rem;color:var(--parchment);">奥付に現刻を記入する</span>
+        </label>
+        <input type="text" id="col-author" placeholder="著者（ペンネーム）" style="flex:1;min-width:160px;" oninput="updateColophonPreview()">
+      </div>
+      <div class="sec-label">刊記紋を作る</div>
+      <div class="seal-preview-wrap">
+        <div class="seal-preview-box">
+          <svg id="seal-preview-svg" viewBox="0 0 100 100" width="100" height="100" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+      </div>
+      <div style="font-size:0.6rem;letter-spacing:0.18em;color:var(--accent);margin-bottom:0.35rem;">外枠</div>
+      <div class="seal-part-row" id="seal-frame-grid"></div>
+      <div class="seal-color-row" id="seal-frame-colors"></div>
+      <div style="font-size:0.6rem;letter-spacing:0.18em;color:var(--accent);margin-bottom:0.35rem;">中心紋</div>
+      <div class="seal-part-row" id="seal-symbol-grid"></div>
+      <div class="seal-color-row" id="seal-symbol-colors"></div>
+      <div style="font-size:0.6rem;letter-spacing:0.18em;color:var(--accent);margin-bottom:0.35rem;">装飾</div>
+      <div class="seal-part-row" id="seal-ornament-grid"></div>
+      <div class="seal-color-row" id="seal-ornament-colors"></div>
+      <div style="margin-top:0.8rem;padding:0.8rem 1rem;background:var(--bg2);border:1px solid var(--border);border-radius:2px;font-size:0.75rem;color:var(--ink-dim);line-height:1.9;">
+        <span id="col-preview-mark" style="vertical-align:middle;margin-right:0.5rem;"></span>
+        <span id="col-preview-author" style="color:var(--parchment);"></span>
+        <span id="col-preview-date" style="margin-left:0.5rem;"></span><br>
+        <span style="font-size:0.65rem;letter-spacing:0.15em;color:var(--accent);">ノストイ叙事詩環　Nóstoi-Grimoire</span>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <button class="btn btn-p" onclick="finishStory()">完成</button>
+      </div>
+    </div>
+
+    <!-- キャラクター詳細ビュー（セッション一覧） -->
     <div id="char-detail-view">
-      <!-- 上段：キャラ名 -->
       <div style="margin-bottom:0.5rem;">
         <div class="char-detail-name" id="detail-char-name"></div>
         <div class="char-detail-sub" id="detail-char-sub"></div>
       </div>
-      <!-- 下段：操作ボタン -->
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
         <button class="btn btn-g btn-sm" onclick="backToCharList()">← 一覧</button>
         <button class="btn btn-g btn-sm" onclick="showCharSheet()">シート</button>
@@ -575,18 +884,23 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
         <button class="btn btn-d btn-sm" id="btn-lost-char" onclick="openLostModal()">死亡</button>
         <button class="btn btn-d btn-sm" onclick="openDeleteCharModal(currentCharId)">削除</button>
       </div>
-      <div class="search-bar">
-        <input type="text" id="role-search" placeholder="ロールを検索…" oninput="renderRoles()">
-        <select id="role-filter-type" onchange="renderRoles()" style="width:auto;">
-          <option value="">すべて</option><option value="opp">相手</option><option value="self">自分</option>
-        </select>
-      </div>
       <div class="sec-label">セッション</div>
-      <div id="session-list" style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.8rem;"></div>
-      <div class="btn-row" style="margin-top:0;">
-        <button class="btn btn-p" onclick="openModal('modal-new-role')">＋ ロールを記録</button>
+      <div class="btn-row" style="margin-top:0;margin-bottom:0.8rem;">
+        <button class="btn btn-p" onclick="openNewRoleModal(null)">＋ ロールを記録</button>
       </div>
-      <div id="role-list" style="margin-top:1rem;"></div>
+      <div id="session-card-list"></div>
+    </div>
+
+    <!-- セッション内ロール一覧ビュー -->
+    <div id="session-role-view" style="display:none;">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <button class="btn btn-g btn-sm" onclick="backToSessionList()">← セッション</button>
+        <span id="session-role-title" style="font-size:0.85rem;color:var(--parchment);letter-spacing:0.08em;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      </div>
+      <div class="btn-row" style="margin-top:0;margin-bottom:0.8rem;">
+        <button class="btn btn-p" onclick="openNewRoleModal(currentSession)">＋ このセッションに記録</button>
+      </div>
+      <div id="session-role-list"></div>
     </div>
 
     <!-- キャラクター作成・編集フォーム -->
@@ -745,6 +1059,19 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
   <!-- ── アーカイブページ ── -->
   <div class="page" id="page-archive">
     <div id="archive-announce-area" style="margin-bottom:1rem;"></div>
+
+    <!-- 共有写本セクション -->
+    <div style="margin-bottom:1.2rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+        <span class="sec-label" style="margin:0;">共有写本</span>
+        <label style="cursor:pointer;">
+          <input type="file" id="shared-story-file" accept=".json" style="display:none;" onchange="loadSharedStory(event)">
+          <span class="btn btn-g btn-sm">＋ 写本を開く</span>
+        </label>
+      </div>
+      <div id="shared-story-list"></div>
+    </div>
+
     <div class="search-bar">
       <input type="text" id="db-search" placeholder="記事を検索…" oninput="renderDB()">
       <select id="db-cat-filter" onchange="renderDB()" style="width:auto;"><option value="">すべて</option></select>
@@ -757,6 +1084,21 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
       </div>
     </div>
     <div id="db-content"></div>
+  </div>
+
+  <!-- 共有写本ビューア -->
+  <div class="page" id="page-story-viewer" style="display:none;">
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.2rem;">
+      <button class="btn btn-g btn-sm" onclick="closeStoryViewer()">← 戻る</button>
+      <span id="viewer-title-label" style="font-size:0.85rem;color:var(--parchment);letter-spacing:0.1em;flex:1;"></span>
+      <button class="btn btn-g btn-sm" id="viewer-vert-btn" onclick="toggleViewerVertical()">横書き</button>
+    </div>
+    <!-- 刊記紋 + メタ情報 -->
+    <div id="viewer-meta" style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;padding:0.8rem 1rem;background:var(--bg2);border:1px solid var(--border);border-radius:2px;"></div>
+    <!-- 本文 -->
+    <div id="viewer-body" style="font-size:0.9rem;line-height:2.2;color:var(--ink);font-family:var(--font-serif);"></div>
+    <!-- 奥付 -->
+    <div id="viewer-colophon" style="display:none;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);text-align:center;"></div>
   </div>
 
   <!-- ── 分析ページ ── -->
@@ -806,7 +1148,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
         <div id="assist-result"></div>
       </div>
       <!-- 叙述チャット -->
-      <div id="apanel-chat" style="display:none;flex-direction:column;height:calc(100vh - 210px);">
+      <div id="apanel-chat" style="display:none;flex-direction:column;height:calc(100vh - 52px - 40px - calc(52px + env(safe-area-inset-bottom)) - 2.4rem);">
         <div id="chat-messages" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0.8rem;padding-bottom:0.5rem;min-height:0;"></div>
         <div style="display:flex;gap:0.5rem;align-items:flex-end;padding-top:0.8rem;border-top:1px solid var(--border);margin-top:0.5rem;flex-shrink:0;">
           <textarea id="chat-input" rows="3" placeholder="グリモワールに話しかける…" style="flex:1;resize:none;font-size:0.85rem;line-height:1.8;" onkeydown="chatKeydown(event)"></textarea>
@@ -1023,13 +1365,33 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
     </div>
     <div class="options-section" id="opt-sound-section" style="display:none;">
       <div class="options-section-title">サウンド</div>
-      <div class="volume-row">
-        <div class="volume-header"><span class="volume-label">SE 音量</span><span class="volume-value" id="se-vol-label">70</span></div>
-        <input type="range" id="opt-se-vol" min="0" max="100" value="70" oninput="onVolumeChange('se',this.value)" style="--val:70%;">
+      <div class="toggle-row" style="margin-bottom:0.8rem;">
+        <div>
+          <div class="toggle-label">BGM 再生</div>
+          <div class="toggle-desc">OFFにするとBGMの再生を完全に停止します</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="opt-bgm-enabled" checked onchange="onSoundEnabledToggle('bgm')">
+          <span class="toggle-slider"></span>
+        </label>
       </div>
-      <div class="volume-row">
+      <div class="volume-row" id="bgm-vol-row">
         <div class="volume-header"><span class="volume-label">BGM 音量</span><span class="volume-value" id="bgm-vol-label">40</span></div>
         <input type="range" id="opt-bgm-vol" min="0" max="100" value="40" oninput="onVolumeChange('bgm',this.value)" style="--val:40%;">
+      </div>
+      <div class="toggle-row" style="margin-top:0.8rem;margin-bottom:0.8rem;">
+        <div>
+          <div class="toggle-label">SE 再生</div>
+          <div class="toggle-desc">OFFにするとSEの再生を完全に停止します</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="opt-se-enabled" checked onchange="onSoundEnabledToggle('se')">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="volume-row" id="se-vol-row">
+        <div class="volume-header"><span class="volume-label">SE 音量</span><span class="volume-value" id="se-vol-label">70</span></div>
+        <input type="range" id="opt-se-vol" min="0" max="100" value="70" oninput="onVolumeChange('se',this.value)" style="--val:70%;">
       </div>
     </div>
     <div class="options-section">
@@ -1073,12 +1435,12 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
       <div class="options-section-title">データ管理</div>
       <p style="font-size:0.78rem;color:var(--ink-dim);line-height:1.8;margin-bottom:1rem;">キャラクター・ロールのデータをエクスポート・インポートできます。</p>
       <div class="btn-row" style="margin-top:0;">
-        <button class="btn btn-g" onclick="exportData()">📤 書き出す</button>
-        <button class="btn btn-g" onclick="importData()">📂 読み込む</button>
+        <button class="btn btn-g" onclick="exportData()">📤 全データをバックアップ</button>
+        <button class="btn btn-g" onclick="importData()">📂 バックアップから復元</button>
       </div>
       <hr class="sep">
       <p style="font-size:0.75rem;color:#c87070;line-height:1.8;margin-bottom:0.8rem;">⚠ 以下の操作は取り消せません</p>
-      <button class="btn btn-d" onclick="clearAllData()">全データを消去</button>
+      <button class="btn btn-d" onclick="clearAllData()">⚠ 全データを消去</button>
     </div>
     <div class="options-section" id="opt-db-section">
       <div class="options-section-title">世界観資料</div>
@@ -1104,7 +1466,8 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 
 <div class="modal-overlay" id="modal-new-role">
   <div class="modal">
-    <div class="modal-title">ロールを記録</div>
+    <div class="modal-title" id="nr-modal-title">ロールを記録</div>
+    <input type="hidden" id="nr-edit-id" value="">
     <label class="fl" style="margin-top:0;">種別</label>
     <select id="nr-type"><option value="opp">相手のロール</option><option value="self">自分のロール</option></select>
     <label class="fl">セッション名</label>
@@ -1371,6 +1734,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 <input type="file" id="import-file" accept=".json" style="display:none;">
 <input type="file" id="db-file" accept=".json" style="display:none;">
 <audio id="se-page" src="" preload="metadata"></audio>
+<audio id="se-tab"  src="" preload="metadata"></audio>
 <audio id="bgm-main" src="" loop preload="metadata"></audio>
 
 <script>
@@ -1382,14 +1746,16 @@ const KEY_ANN    = 'gm_announce_cache';
 const KEY_API    = 'gm_apikey';
 const KEY_OPTS   = 'gm_options';
 const KEY_LAST_EXPORT = 'gm_last_export';
+const KEY_STORIES  = 'gm_stories';
 const GIST_URL   = '';
 const BACKUP_REMIND_DAYS = 30;
 
 const DEFAULT_CATS  = ['歴史・政治','魔法・術式','戦術・戦闘','キャラクター心理','世界観整合性'];
 const ASSIST_MODES  = [{id:'draft',name:'返しの草案生成'},{id:'skeleton',name:'構造提案'},{id:'emotion',name:'感情・動機の深掘り'},{id:'tension',name:'緊張感の設計'}];
 
-let isOnline=false, characters=[], roles=[], worldDB=null, announces=[], apiKey='';
-let options={animation:true,seVol:70,bgmVol:40,exportApiKey:false};
+let isOnline=false, characters=[], roles=[], stories=[], worldDB=null, announces=[], apiKey='';
+let currentStoryId=null, storyCharIds=[], storySessionRefs=[];
+let options={animation:true,seVol:70,bgmVol:40,exportApiKey:false,bgmEnabled:true,seEnabled:true};
 let currentCharId=null, editingCharId=null;
 const checkedCats={opp:new Set(),self:new Set()}, checkedModes=new Set();
 
@@ -1674,6 +2040,9 @@ function launchApp(){
     document.getElementById('opt-sound-section').style.display='block';
     fetchAnnounce();
     if(options.animation) initParticles();
+    // SE読み込み
+    const seTab=document.getElementById('se-tab');
+    if(seTab) seTab.src='https://nostoi-creator.github.io/GM_Tabsound_SE.mp3';
     // BGM再生：0から3秒かけてフェードイン
     if(_bgmBuffer&&_bgmCtx){
       _bgmGain.gain.value=0;
@@ -1806,7 +2175,7 @@ function burstParticles(fromDir){
 
 // ══ オーディオ ══
 function playSE(name){
-  if(!isOnline)return;
+  if(!isOnline||!options.seEnabled)return;
   const el=document.getElementById(`se-${name}`);
   if(!el||!el.src||el.src===location.href)return;
   el.currentTime=0; el.volume=options.seVol/100; el.play().catch(()=>{});
@@ -1822,7 +2191,7 @@ function playSETitle(){
 }
 
 // ══ オプション ══
-function loadOptions(){const s=JSON.parse(localStorage.getItem(KEY_OPTS)||'{}'); options.animation=s.animation!==undefined?s.animation:true; options.seVol=s.seVol??70; options.bgmVol=s.bgmVol??40; options.exportApiKey=s.exportApiKey||false;}
+function loadOptions(){const s=JSON.parse(localStorage.getItem(KEY_OPTS)||'{}'); options.animation=s.animation!==undefined?s.animation:true; options.seVol=s.seVol??70; options.bgmVol=s.bgmVol??40; options.exportApiKey=s.exportApiKey||false; options.bgmEnabled=s.bgmEnabled!==undefined?s.bgmEnabled:true; options.seEnabled=s.seEnabled!==undefined?s.seEnabled:true;}
 function saveOptions(){localStorage.setItem(KEY_OPTS,JSON.stringify(options));}
 function openOptions(){
   setDiceAnim(diceAnimMode);
@@ -1833,6 +2202,10 @@ function openOptions(){
   sv.style.setProperty('--val',options.seVol+'%'); bv.style.setProperty('--val',options.bgmVol+'%');
   document.getElementById('se-vol-label').textContent=options.seVol;
   document.getElementById('bgm-vol-label').textContent=options.bgmVol;
+  // サウンド有効トグル
+  const bgmEn=document.getElementById('opt-bgm-enabled'), seEn=document.getElementById('opt-se-enabled');
+  if(bgmEn){bgmEn.checked=options.bgmEnabled; document.getElementById('bgm-vol-row').style.opacity=options.bgmEnabled?'1':'0.35';}
+  if(seEn){seEn.checked=options.seEnabled; document.getElementById('se-vol-row').style.opacity=options.seEnabled?'1':'0.35';}
   // APIキーセクション
   const statusEl=document.getElementById('api-key-status');
   if(statusEl) statusEl.textContent=apiKey?`登録済み（AIza…${apiKey.slice(-4)}）`:'未登録';
@@ -1864,14 +2237,45 @@ function onVolumeChange(t,v){
   else{options.bgmVol=n;document.getElementById('bgm-vol-label').textContent=n;document.getElementById('opt-bgm-vol').style.setProperty('--val',n+'%');setBGMVolume(n/100);}
   saveOptions();
 }
+function onSoundEnabledToggle(t){
+  if(t==='bgm'){
+    options.bgmEnabled=document.getElementById('opt-bgm-enabled').checked;
+    document.getElementById('bgm-vol-row').style.opacity=options.bgmEnabled?'1':'0.35';
+    if(options.bgmEnabled){
+      // 再開：AudioContextがsuspendedなら復帰してBGMを再生
+      if(_bgmCtx&&_bgmCtx.state==='suspended') _bgmCtx.resume().catch(()=>{});
+      else if(_bgmCtx&&!_bgmSource){ _bgmGain.gain.value=options.bgmVol/100; _playBGMLoop(); }
+      else if(_bgmFallbackUrl){
+        const bgm=document.getElementById('bgm-main');
+        if(bgm.paused){bgm.volume=options.bgmVol/100; bgm.play().catch(()=>{});}
+      }
+    } else {
+      // 停止：AudioContextをsuspend、fallback audio も停止
+      if(_bgmCtx) _bgmCtx.suspend().catch(()=>{});
+      const bgm=document.getElementById('bgm-main');
+      if(!bgm.paused) bgm.pause();
+    }
+  } else {
+    options.seEnabled=document.getElementById('opt-se-enabled').checked;
+    document.getElementById('se-vol-row').style.opacity=options.seEnabled?'1':'0.35';
+  }
+  saveOptions();
+}
 
 // ══ ナビ ══
 let currentPage='roleplay';
 const PAGE_ORDER=['archive','roleplay','analyze'];
 function switchPage(name){
   if(name===currentPage)return;
-  if(!isOnline && name==='analyze')return; // オフライン時はグリモワール封鎖
-  // 方向判定：右側タブへの移動なら左から風、左側なら右から風
+  if(!isOnline && name==='analyze')return;
+  // 叙述タブ以外に移る際はbag-btnを元の位置に戻す
+  if(name!=='analyze'){
+    const bb=document.getElementById('bag-btn');
+    const bm=document.getElementById('bag-menu');
+    bb.classList.remove('chat-mode');
+    bm.classList.remove('chat-mode');
+    if(bagOpen){bagOpen=false;bb.classList.remove('open');bm.classList.remove('open');}
+  }
   const fromIdx=PAGE_ORDER.indexOf(currentPage);
   const toIdx=PAGE_ORDER.indexOf(name);
   const windDir=(toIdx>fromIdx)?'left':'right';
@@ -1888,9 +2292,18 @@ function switchPage(name){
   document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
   document.getElementById(`bnav-${name}`).classList.add('active');
   currentPage=name;
-  if(name==='archive')renderArchiveArea(!isOnline);
-  // 火の粉バースト（アニメON時のみ）
+  if(name==='archive'){renderArchiveArea(!isOnline);renderSharedStoryList();}
+  // analyzeタブに戻った際、叙述タブがアクティブならchat-modeを再適用
+  if(name==='analyze'){
+    const chatTab=document.getElementById('apanel-chat');
+    const isChat=chatTab&&chatTab.classList.contains('active-panel');
+    const bb=document.getElementById('bag-btn');
+    const bm=document.getElementById('bag-menu');
+    bb.classList.toggle('chat-mode',isChat);
+    bm.classList.toggle('chat-mode',isChat);
+  }
   if(options.animation)burstParticles(windDir);
+  playSE('tab');
 }
 function switchAnalyzeTab(tab){
   ['opp','self','assist','chat'].forEach(t=>{
@@ -1905,6 +2318,14 @@ function switchAnalyzeTab(tab){
   else activePanel.style.display='block';
   const activeBtn=document.getElementById(`atab-${tab}`);
   if(activeBtn){activeBtn.style.borderBottom='2px solid var(--accent)';activeBtn.style.color='var(--accent)';}
+  // 叙述タブ時はツールボタンを左側へ移動、それ以外は右側に戻す
+  const bagBtn=document.getElementById('bag-btn');
+  const bagMenu=document.getElementById('bag-menu');
+  const isChat=(tab==='chat');
+  bagBtn.classList.toggle('chat-mode',isChat);
+  bagMenu.classList.toggle('chat-mode',isChat);
+  // メニューが開いていたら閉じる（位置変更時のチラつき防止）
+  if(bagOpen){ bagOpen=false; bagBtn.classList.remove('open'); bagMenu.classList.remove('open'); }
 }
 
 // ── 叙述チャット ──
@@ -1969,7 +2390,7 @@ ${hasArchive
         parts:[{text:m.content}]
       }))
     ];
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:geminiContents})
@@ -2077,10 +2498,12 @@ function gmDialogCancel(){
 
 // ══ キャラクター管理 ══
 function showView(name){
-  ['char-list-view','char-detail-view','char-form-view','char-sheet-view'].forEach(id=>{
+  ['char-list-view','char-detail-view','char-form-view','char-sheet-view',
+   'session-role-view','story-edit-view','story-colophon-view','page-story-viewer'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
   document.getElementById(name).style.display='block';
+  if(name==='char-list-view') renderStoryList();
 }
 
 function renderCharList(){
@@ -2334,7 +2757,15 @@ function saveChar(){
     magics:getDynamicItems('magics'),
     createdAt:editingCharId?characters.find(c=>c.id===editingCharId)?.createdAt:Date.now()
   };
-  if(editingCharId){const i=characters.findIndex(c=>c.id===editingCharId);if(i>=0)characters[i]=c;}
+  if(editingCharId){
+    const i=characters.findIndex(c=>c.id===editingCharId);
+    if(i>=0){
+      // 死亡フラグなど編集フォームに存在しないフィールドを引き継ぐ
+      const prev=characters[i];
+      if(prev.lost) c.lost=prev.lost;
+      characters[i]=c;
+    }
+  }
   else characters.push(c);
   localStorage.setItem(KEY_CHARS,JSON.stringify(characters));
   currentCharId=c.id;
@@ -2406,8 +2837,14 @@ function confirmDeleteChar(){
   const withExport=document.getElementById('delete-char-with-roles').checked;
   characters=characters.filter(c=>c.id!==_deleteTargetId);
   roles=roles.filter(r=>r.charId!==_deleteTargetId);
+  // ストーリーのキャラ紐付けからも除去
+  stories.forEach(s=>{
+    if(s.charIds) s.charIds=s.charIds.filter(id=>id!==_deleteTargetId);
+    if(s.sessionRefs) s.sessionRefs=s.sessionRefs.filter(r=>r.charId!==_deleteTargetId);
+  });
   localStorage.setItem(KEY_CHARS,JSON.stringify(characters));
   localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
+  localStorage.setItem(KEY_STORIES,JSON.stringify(stories));
   if(currentCharId===_deleteTargetId) currentCharId=null;
   _deleteTargetId=null;
   closeModal('modal-delete-final');
@@ -2455,34 +2892,123 @@ function buildSheetText(c){
 
 function copySheet(){
   const text=document.getElementById('sheet-preview-text').textContent;
-  navigator.clipboard.writeText(text).then(()=>{
+  clipboardWrite(text,()=>{
     const btn=document.querySelector('#char-sheet-view .btn-p');
     const o=btn.textContent; btn.textContent='✓ コピー済'; setTimeout(()=>btn.textContent=o,1500);
   });
 }
 
 // ══ ロール管理 ══
+let currentSession=null;
+
 function renderRoles(){
   if(!currentCharId)return;
-  const q=(document.getElementById('role-search')?.value||'').toLowerCase();
-  const filter=document.getElementById('role-filter-type')?.value||'';
-  const list=document.getElementById('role-list');
-  let filtered=roles.filter(r=>{
-    if(r.charId!==currentCharId)return false;
-    if(filter&&r.type!==filter)return false;
-    if(q&&!r.body.toLowerCase().includes(q)&&!r.session?.toLowerCase().includes(q)&&!(r.tags||[]).some(t=>t.toLowerCase().includes(q)))return false;
-    return true;
-  }).sort((a,b)=>b.createdAt-a.createdAt);
-  list.innerHTML=filtered.length?filtered.map(r=>roleCardHTML(r)).join(''):'<div class="empty"><div class="empty-icon">📜</div><div class="empty-text">ロールがありません</div></div>';
-  if(filtered.length) filtered.forEach(r=>{const c=document.getElementById(`rc-${r.id}`);if(c)c.onclick=()=>toggleRoleDetail(r.id);});
-  const sessions=[...new Set(roles.filter(r=>r.charId===currentCharId).map(r=>r.session).filter(Boolean))];
-  const sdl=document.getElementById('session-datalist'); sdl.innerHTML=sessions.map(s=>`<option value="${escAttr(s)}">`).join('');
-  const sl=document.getElementById('session-list'); sl.innerHTML=sessions.slice(0,10).map(s=>`<span class="tag-chip" style="cursor:pointer;" onclick="filterSession('${escAttr(s)}')">${escHtml(s)}</span>`).join('');
+  const sessions=[...new Set(roles.filter(r=>r.charId===currentCharId).map(r=>r.session||'').filter(Boolean))];
+  const sdl=document.getElementById('session-datalist');
+  if(sdl) sdl.innerHTML=sessions.map(s=>`<option value="${escAttr(s)}">`).join('');
+  renderSessionCards();
+}
+
+function renderSessionCards(){
+  const charRoles=roles.filter(r=>r.charId===currentCharId);
+  const map=new Map();
+  charRoles.forEach(r=>{
+    const key=r.session||'';
+    if(!map.has(key)) map.set(key,[]);
+    map.get(key).push(r);
+  });
+  const list=document.getElementById('session-card-list');
+  if(!list)return;
+  if(map.size===0){
+    list.innerHTML='<div class="empty"><div class="empty-icon">📜</div><div class="empty-text">セッションがありません</div></div>';
+    return;
+  }
+  const entries=[...map.entries()].sort((a,b)=>{
+    const aMax=Math.max(...a[1].map(r=>r.createdAt||0));
+    const bMax=Math.max(...b[1].map(r=>r.createdAt||0));
+    return bMax-aMax;
+  });
+  list.innerHTML=entries.map(([name,rs])=>{
+    const label=name||'（セッション名なし）';
+    return `<div class="session-card" onclick="openSession('${escAttr(name)}')"><span class="session-card-name">${escHtml(label)}</span><span class="session-card-count">${rs.length}件</span><span class="session-card-arrow">›</span></div>`;
+  }).join('');
+}
+
+function openSession(sessionName){
+  currentSession=sessionName;
+  document.getElementById('char-detail-view').style.display='none';
+  document.getElementById('session-role-view').style.display='block';
+  const label=sessionName||'（セッション名なし）';
+  document.getElementById('session-role-title').textContent=label;
+  renderSessionRoles();
+}
+
+function backToSessionList(){
+  currentSession=null;
+  document.getElementById('session-role-view').style.display='none';
+  document.getElementById('char-detail-view').style.display='block';
+  renderSessionCards();
+}
+
+function renderSessionRoles(){
+  const sessionRoles=roles
+    .filter(r=>r.charId===currentCharId&&(r.session||'')===(currentSession||''))
+    .sort((a,b)=>(a.order!=null?a.order:a.createdAt)-(b.order!=null?b.order:b.createdAt));
+  const list=document.getElementById('session-role-list');
+  if(!list)return;
+  if(sessionRoles.length===0){
+    list.innerHTML='<div class="empty"><div class="empty-icon">📜</div><div class="empty-text">ロールがありません</div></div>';
+    return;
+  }
+  list.innerHTML=sessionRoles.map((r,idx)=>{
+    const date=new Date(r.createdAt).toLocaleDateString('ja-JP');
+    const tags=r.tags&&r.tags.length?`<div class="role-tags">${r.tags.map(t=>`<span class="tag-chip">${escHtml(t)}</span>`).join('')}</div>`:'';
+    const analyzeBtn=apiKey&&isOnline?`<button class="btn btn-g btn-sm" onclick="sendToGrimoire('${r.id}')">👁 分析</button>`:'';
+    return `<div style="margin-bottom:0.8rem;"><div style="display:flex;align-items:center;gap:0.3rem;margin-bottom:0.3rem;"><button class="role-order-btn" onclick="reorderRole('${r.id}',-1)" ${idx===0?'disabled':''}title="上へ">↑</button><button class="role-order-btn" onclick="reorderRole('${r.id}',1)" ${idx===sessionRoles.length-1?'disabled':''}title="下へ">↓</button><span class="role-type-badge ${r.type==='opp'?'badge-opp':'badge-self'}" style="margin-left:0.2rem;">${r.type==='opp'?'相手':'自分'}</span><span style="font-size:0.65rem;color:var(--parchment-dk);margin-left:auto;">${date}</span></div><div class="role-card selected" style="cursor:default;margin-bottom:0.3rem;" id="rc-${r.id}"><div class="role-preview">${escHtml(r.body)}</div>${r.memo?`<div style="font-size:0.75rem;color:var(--ink-dim);margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);">📝 ${escHtml(r.memo)}</div>`:''} ${tags}</div><div style="display:flex;gap:0.3rem;flex-wrap:wrap;">${analyzeBtn}<button class="btn btn-g btn-sm" onclick="editRole('${r.id}')">編集</button><button class="btn btn-d btn-sm" onclick="deleteRole('${r.id}')">削除</button></div></div>`;
+  }).join('');
+}
+
+function reorderRole(id,dir){
+  const sessionRoles=roles
+    .filter(r=>r.charId===currentCharId&&(r.session||'')===(currentSession||''))
+    .sort((a,b)=>(a.order!=null?a.order:a.createdAt)-(b.order!=null?b.order:b.createdAt));
+  sessionRoles.forEach((r,i)=>{r.order=i;});
+  const idx=sessionRoles.findIndex(r=>r.id===id);
+  const swapIdx=idx+dir;
+  if(swapIdx<0||swapIdx>=sessionRoles.length)return;
+  const tmp=sessionRoles[idx].order;
+  sessionRoles[idx].order=sessionRoles[swapIdx].order;
+  sessionRoles[swapIdx].order=tmp;
+  localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
+  renderSessionRoles();
+}
+
+function openNewRoleModal(sessionName){
+  document.getElementById('nr-modal-title').textContent='ロールを記録';
+  document.getElementById('nr-edit-id').value='';
+  document.getElementById('nr-type').value='opp';
+  document.getElementById('nr-session').value=sessionName||'';
+  document.getElementById('nr-body').value='';
+  document.getElementById('nr-memo').value='';
+  document.getElementById('nr-tags').value='';
+  openModal('modal-new-role');
+}
+
+function editRole(id){
+  const r=roles.find(r=>r.id===id); if(!r)return;
+  document.getElementById('nr-modal-title').textContent='ロールを編集';
+  document.getElementById('nr-edit-id').value=id;
+  document.getElementById('nr-type').value=r.type||'opp';
+  document.getElementById('nr-session').value=r.session||'';
+  document.getElementById('nr-body').value=r.body||'';
+  document.getElementById('nr-memo').value=r.memo||'';
+  document.getElementById('nr-tags').value=(r.tags||[]).join(', ');
+  openModal('modal-new-role');
 }
 
 function roleCardHTML(r){
   const date=new Date(r.createdAt).toLocaleDateString('ja-JP');
-  const tags=r.tags?.length?`<div class="role-tags">${r.tags.map(t=>`<span class="tag-chip">${escHtml(t)}</span>`).join('')}</div>`:'';
+  const tags=r.tags&&r.tags.length?`<div class="role-tags">${r.tags.map(t=>`<span class="tag-chip">${escHtml(t)}</span>`).join('')}</div>`:'';
   return `<div class="role-card" id="rc-${r.id}"><div class="role-card-header"><span class="role-type-badge ${r.type==='opp'?'badge-opp':'badge-self'}">${r.type==='opp'?'相手':'自分'}</span><span class="role-session">${escHtml(r.session||'（セッション名なし）')}</span><span class="role-date">${date}</span></div><div class="role-preview">${escHtml(r.body)}</div>${tags}</div>`;
 }
 
@@ -2490,20 +3016,19 @@ function sendToGrimoire(id){
   const r=roles.find(r=>r.id===id); if(!r)return;
   if(!isOnline){gmAlert('グリモワール機能はオンラインモードのみ使用できます');return;}
   if(!apiKey){openModal('modal-api-setup');return;}
-  // 分析タブに転送
   const targetTab=r.type==='opp'?'opp':'self';
   const textEl=document.getElementById(`${targetTab}-text`);
   if(textEl) textEl.value=r.body;
   switchPage('analyze');
   switchAnalyzeTab(targetTab);
-  // ボトムナビ更新
   document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('bnav-analyze').classList.add('active');
 }
+
 function toggleRoleDetail(id){
   const ex=document.getElementById(`detail-${id}`);
-  if(ex){ex.remove();document.getElementById(`rc-${id}`)?.classList.remove('selected');return;}
-  document.getElementById(`rc-${id}`)?.classList.add('selected');
+  if(ex){ex.remove();document.getElementById(`rc-${id}`)&&document.getElementById(`rc-${id}`).classList.remove('selected');return;}
+  document.getElementById(`rc-${id}`)&&document.getElementById(`rc-${id}`).classList.add('selected');
   const r=roles.find(r=>r.id===id); if(!r)return;
   const d=document.createElement('div'); d.className='detail-view'; d.id=`detail-${id}`;
   const analyzeBtn=apiKey&&isOnline?`<button class="btn btn-g btn-sm" style="margin-left:0.4rem;" onclick="event.stopPropagation();sendToGrimoire('${id}')">👁 分析</button>`:'';
@@ -2511,30 +3036,1045 @@ function toggleRoleDetail(id){
   document.getElementById(`rc-${id}`).after(d);
 }
 
-function filterSession(s){document.getElementById('role-search').value=s;renderRoles();}
+function filterSession(s){renderRoles();}
 
 function saveRole(){
   if(!currentCharId){gmAlert('キャラクターを選択してください');return;}
   const body=document.getElementById('nr-body').value.trim();
   if(!body){gmAlert('ロール本文を入力してください');return;}
   const tagsRaw=document.getElementById('nr-tags').value.trim();
-  roles.push({id:'r_'+Date.now(),charId:currentCharId,type:document.getElementById('nr-type').value,session:document.getElementById('nr-session').value.trim(),body,memo:document.getElementById('nr-memo').value.trim(),tags:tagsRaw?tagsRaw.split(',').map(t=>t.trim()).filter(Boolean):[],createdAt:Date.now()});
+  const editId=document.getElementById('nr-edit-id').value;
+  const sessionVal=document.getElementById('nr-session').value.trim();
+  if(editId){
+    const r=roles.find(r=>r.id===editId); if(!r)return;
+    r.type=document.getElementById('nr-type').value;
+    r.session=sessionVal;
+    r.body=body;
+    r.memo=document.getElementById('nr-memo').value.trim();
+    r.tags=tagsRaw?tagsRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
+  } else {
+    const sameSession=roles.filter(r=>r.charId===currentCharId&&(r.session||'')===sessionVal);
+    const maxOrder=sameSession.length?Math.max(...sameSession.map(r=>r.order!=null?r.order:r.createdAt)):0;
+    roles.push({id:'r_'+Date.now(),charId:currentCharId,type:document.getElementById('nr-type').value,session:sessionVal,body,memo:document.getElementById('nr-memo').value.trim(),tags:tagsRaw?tagsRaw.split(',').map(t=>t.trim()).filter(Boolean):[],createdAt:Date.now(),order:maxOrder+1});
+  }
   localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
   closeModal('modal-new-role');
   ['nr-session','nr-body','nr-memo','nr-tags'].forEach(id=>document.getElementById(id).value='');
-  renderRoles();
+  document.getElementById('nr-edit-id').value='';
+  if(currentSession!==null){
+    currentSession=sessionVal;
+    document.getElementById('session-role-title').textContent=sessionVal||'（セッション名なし）';
+    renderSessionRoles();
+  } else {
+    renderSessionCards();
+  }
 }
 
 function deleteRole(id){
   gmConfirm('このロールを削除しますか？',()=>{
-    roles=roles.filter(r=>r.id!==id); localStorage.setItem(KEY_ROLES,JSON.stringify(roles)); renderRoles();
+    roles=roles.filter(r=>r.id!==id);
+    localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
+    if(currentSession!==null) renderSessionRoles();
+    else renderSessionCards();
   });
+}
+
+
+
+// ══ ストーリー ══
+// ── 刊記紋パーツ定義（SVGレイヤー） ──
+const SC='SEALCOLOR'; // placeholder - replaced at render time
+
+// 外枠
+const SEAL_FRAMES=[
+  {id:'none',   label:'なし',   svg:''},
+  {id:'circle', label:'単円',   svg:`<circle cx="50" cy="50" r="43" fill="none" stroke="${SC}" stroke-width="2.2"/>`},
+  {id:'double', label:'二重円', svg:`<circle cx="50" cy="50" r="44" fill="none" stroke="${SC}" stroke-width="1.5"/><circle cx="50" cy="50" r="37" fill="none" stroke="${SC}" stroke-width="0.9"/>`},
+  {id:'shield', label:'盾形',   svg:`<path d="M50 7 L87 17 L87 55 Q87 80 50 93 Q13 80 13 55 L13 17 Z" fill="none" stroke="${SC}" stroke-width="2.2" stroke-linejoin="round"/>`},
+  {id:'hex',    label:'六角',   svg:`<polygon points="50,5 89,27 89,73 50,95 11,73 11,27" fill="none" stroke="${SC}" stroke-width="2" stroke-linejoin="round"/>`},
+  {id:'wreath', label:'月桂',   svg:`<circle cx="50" cy="50" r="42" fill="none" stroke="${SC}" stroke-width="1.5" stroke-dasharray="3.5,2.5"/><ellipse cx="50" cy="8" rx="4" ry="5" fill="${SC}" opacity="0.9"/><ellipse cx="50" cy="92" rx="4" ry="5" fill="${SC}" opacity="0.9"/><ellipse cx="8" cy="50" rx="5" ry="4" fill="${SC}" opacity="0.9"/><ellipse cx="92" cy="50" rx="5" ry="4" fill="${SC}" opacity="0.9"/><ellipse cx="20" cy="20" rx="3.5" ry="4" fill="${SC}" opacity="0.75" transform="rotate(45 20 20)"/><ellipse cx="80" cy="20" rx="3.5" ry="4" fill="${SC}" opacity="0.75" transform="rotate(-45 80 20)"/><ellipse cx="20" cy="80" rx="3.5" ry="4" fill="${SC}" opacity="0.75" transform="rotate(-45 20 80)"/><ellipse cx="80" cy="80" rx="3.5" ry="4" fill="${SC}" opacity="0.75" transform="rotate(45 80 80)"/>`},
+];
+
+// 中心紋
+const SEAL_SYMBOLS=[
+  {id:'none',   label:'なし',   svg:''},
+  {id:'cross',  label:'十字架', svg:`<rect x="46" y="18" width="8" height="64" rx="2" fill="${SC}"/><rect x="26" y="36" width="48" height="8" rx="2" fill="${SC}"/>`},
+  {id:'fleur',  label:'百合紋', svg:`<path d="M50 20 C46 28 40 32 38 38 C36 46 43 48 50 42 C57 48 64 46 62 38 C60 32 54 28 50 20Z" fill="${SC}"/><path d="M50 42 L46 64 L54 64 Z" fill="${SC}"/><path d="M46 64 Q38 68 36 63 Q35 56 43 55 Z" fill="${SC}"/><path d="M54 64 Q62 68 64 63 Q65 56 57 55 Z" fill="${SC}"/><rect x="38" y="64" width="24" height="4" rx="1.5" fill="${SC}"/><path d="M38 68 L41 76 L50 78 L59 76 L62 68 Z" fill="${SC}"/>`},
+  {id:'star6',  label:'六芒星', svg:`<polygon points="50,14 81,68 19,68" fill="${SC}"/><polygon points="50,86 19,32 81,32" fill="${SC}"/>`},
+  {id:'sword',  label:'剣',     svg:`<path d="M47 14 L53 14 L52 66 L50 70 L48 66 Z" fill="${SC}"/><path d="M50 14 L54 10 L52 14 Z" fill="${SC}"/><rect x="33" y="42" width="34" height="6" rx="2" fill="${SC}"/><circle cx="50" cy="77" r="7" fill="${SC}"/><circle cx="50" cy="77" r="4" fill="${SC}" opacity="0.35"/>`},
+  {id:'rose',   label:'薔薇',   svg:`<g transform="rotate(0 50 50)"><ellipse cx="50" cy="28" rx="8" ry="14" fill="${SC}" opacity="0.85"/></g><g transform="rotate(72 50 50)"><ellipse cx="50" cy="28" rx="8" ry="14" fill="${SC}" opacity="0.85"/></g><g transform="rotate(144 50 50)"><ellipse cx="50" cy="28" rx="8" ry="14" fill="${SC}" opacity="0.85"/></g><g transform="rotate(216 50 50)"><ellipse cx="50" cy="28" rx="8" ry="14" fill="${SC}" opacity="0.85"/></g><g transform="rotate(288 50 50)"><ellipse cx="50" cy="28" rx="8" ry="14" fill="${SC}" opacity="0.85"/></g><g transform="rotate(36 50 50)"><ellipse cx="50" cy="36" rx="5" ry="8" fill="${SC}"/></g><g transform="rotate(108 50 50)"><ellipse cx="50" cy="36" rx="5" ry="8" fill="${SC}"/></g><g transform="rotate(180 50 50)"><ellipse cx="50" cy="36" rx="5" ry="8" fill="${SC}"/></g><g transform="rotate(252 50 50)"><ellipse cx="50" cy="36" rx="5" ry="8" fill="${SC}"/></g><g transform="rotate(324 50 50)"><ellipse cx="50" cy="36" rx="5" ry="8" fill="${SC}"/></g><circle cx="50" cy="50" r="7" fill="${SC}"/><circle cx="50" cy="50" r="4" fill="${SC}" opacity="0.3"/>`},
+  {id:'quill',  label:'羽根ペン',svg:`<path d="M55 15 Q78 22 70 55 Q62 72 50 82 L48 78 Q58 66 62 50 Q66 34 52 22 Z" fill="${SC}" opacity="0.85"/><path d="M48 78 Q38 60 44 38 Q48 24 52 22 Q46 34 48 50 Q48 62 50 82 Z" fill="${SC}" opacity="0.6"/><line x1="50" y1="82" x2="50" y2="90" stroke="${SC}" stroke-width="2" stroke-linecap="round"/><line x1="46" y1="86" x2="54" y2="86" stroke="${SC}" stroke-width="1.5" stroke-linecap="round"/>`},
+  {id:'flame',  label:'炎',     svg:`<path d="M50 82 C35 72 28 57 31 42 C33 32 40 26 50 20 C40 34 44 44 45 52 C43 44 47 37 54 32 C49 44 54 53 53 64 C62 52 60 40 65 33 C69 48 63 62 50 82Z" fill="${SC}"/>`},
+];
+
+// 装飾
+const SEAL_ORNAMENTS=[
+  {id:'none',     label:'なし',   svg:''},
+  {id:'dots4',    label:'四点',   svg:`<circle cx="50" cy="7"  r="4" fill="${SC}"/><circle cx="50" cy="93" r="4" fill="${SC}"/><circle cx="7"  cy="50" r="4" fill="${SC}"/><circle cx="93" cy="50" r="4" fill="${SC}"/>`},
+  {id:'corners',  label:'角飾り', svg:`<path d="M9 9 L26 9 M9 9 L9 26" stroke="${SC}" stroke-width="2.5" stroke-linecap="square"/><path d="M91 9 L74 9 M91 9 L91 26" stroke="${SC}" stroke-width="2.5" stroke-linecap="square"/><path d="M9 91 L26 91 M9 91 L9 74" stroke="${SC}" stroke-width="2.5" stroke-linecap="square"/><path d="M91 91 L74 91 M91 91 L91 74" stroke="${SC}" stroke-width="2.5" stroke-linecap="square"/>`},
+  {id:'bands',    label:'上下帯', svg:`<line x1="10" y1="15" x2="90" y2="15" stroke="${SC}" stroke-width="1.8"/><line x1="10" y1="19" x2="90" y2="19" stroke="${SC}" stroke-width="0.8" opacity="0.6"/><line x1="10" y1="85" x2="90" y2="85" stroke="${SC}" stroke-width="1.8"/><line x1="10" y1="81" x2="90" y2="81" stroke="${SC}" stroke-width="0.8" opacity="0.6"/>`},
+  {id:'rays',     label:'放射線', svg:`<line x1="50" y1="2"  x2="50" y2="14" stroke="${SC}" stroke-width="1.5"/><line x1="50" y1="86" x2="50" y2="98" stroke="${SC}" stroke-width="1.5"/><line x1="2"  y1="50" x2="14" y2="50" stroke="${SC}" stroke-width="1.5"/><line x1="86" y1="50" x2="98" y2="50" stroke="${SC}" stroke-width="1.5"/><line x1="14" y1="14" x2="22" y2="22" stroke="${SC}" stroke-width="1.2"/><line x1="86" y1="14" x2="78" y2="22" stroke="${SC}" stroke-width="1.2"/><line x1="14" y1="86" x2="22" y2="78" stroke="${SC}" stroke-width="1.2"/><line x1="86" y1="86" x2="78" y2="78" stroke="${SC}" stroke-width="1.2"/>`},
+  {id:'diamonds', label:'菱飾り', svg:`<polygon points="50,3 55,8 50,13 45,8"   fill="${SC}"/><polygon points="50,87 55,92 50,97 45,92" fill="${SC}"/><polygon points="3,50 8,55 13,50 8,45"   fill="${SC}"/><polygon points="87,50 92,55 97,50 92,45" fill="${SC}"/>`},
+];
+
+// 選択状態
+let sealFrame='circle', sealSymbol='cross', sealOrnament='none';
+let sealColorFrame='#c09040', sealColorSymbol='#c09040', sealColorOrnament='#c09040';
+
+const SEAL_COLOR_PRESETS=[
+  {label:'金',  color:'#c09040'},
+  {label:'古金',color:'#8a6828'},
+  {label:'銀',  color:'#b8b8b8'},
+  {label:'白',  color:'#e8e4d8'},
+  {label:'赤銅',color:'#a03828'},
+  {label:'深紅',color:'#801820'},
+  {label:'青',  color:'#284898'},
+  {label:'深緑',color:'#2a5030'},
+  {label:'紫',  color:'#581888'},
+  {label:'墨',  color:'#2a2018'},
+];
+
+function setSealColor(part,color){
+  const c=color.toLowerCase();
+  if(part==='frame')   sealColorFrame=c;
+  if(part==='symbol')  sealColorSymbol=c;
+  if(part==='ornament')sealColorOrnament=c;
+  refreshSealBuilder();
+}
+
+function buildSealColorRow(containerId, part, currentColor){
+  const el=document.getElementById(containerId); if(!el)return;
+  const cur=currentColor.toLowerCase();
+  // 既存のDOM構造があればスウォッチのselectedとinputのvalueだけ更新してDOM再構築を避ける
+  const existingInput=el.querySelector('.seal-custom-color');
+  if(existingInput){
+    el.querySelectorAll('.seal-cswatch').forEach(btn=>{
+      btn.classList.toggle('selected', btn.dataset.color===cur);
+    });
+    // inputがフォーカス中でなければvalueを更新
+    if(document.activeElement!==existingInput) existingInput.value=cur;
+    return;
+  }
+  // 初回構築
+  const swatches=SEAL_COLOR_PRESETS.map(p=>`<button class="seal-cswatch${p.color===cur?' selected':''}" data-color="${p.color}" style="background:${p.color};" title="${p.label}" onmousedown="event.preventDefault()" onclick="setSealColor('${part}','${p.color}')"></button>`).join('');
+  el.innerHTML=swatches+`<input type="color" class="seal-custom-color" value="${cur}" title="カスタムカラー" onmousedown="event.stopPropagation()" oninput="setSealColor('${part}',this.value)">`;
+}
+
+function buildSealSVG(){
+  const f=SEAL_FRAMES.find(x=>x.id===sealFrame)||SEAL_FRAMES[0];
+  const s=SEAL_SYMBOLS.find(x=>x.id===sealSymbol)||SEAL_SYMBOLS[0];
+  const o=SEAL_ORNAMENTS.find(x=>x.id===sealOrnament)||SEAL_ORNAMENTS[0];
+  const fSvg=f.svg.replace(/SEALCOLOR/g,sealColorFrame);
+  const sSvg=s.svg.replace(/SEALCOLOR/g,sealColorSymbol);
+  const oSvg=o.svg.replace(/SEALCOLOR/g,sealColorOrnament);
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${fSvg}${sSvg}${oSvg}</svg>`;
+}
+
+function buildSealPartGrid(containerId, parts, currentId, setter, partColor){
+  const grid=document.getElementById(containerId); if(!grid)return;
+  const col=partColor||'#c09040';
+  grid.innerHTML=parts.map(p=>{
+    const svgBody=p.svg.replace(/SEALCOLOR/g,col);
+    const miniSvg=p.svg
+      ? `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:36px;">${svgBody}</svg>`
+      : `<span style="font-size:0.65rem;color:var(--parchment-dk);">―</span>`;
+    return `<button class="seal-part-btn${p.id===currentId?' selected':''}" onmousedown="event.preventDefault()" onclick="${setter}('${p.id}')">
+      ${miniSvg}
+      <span class="seal-part-label">${p.label}</span>
+    </button>`;
+  }).join('');
+}
+
+function setSealFrame(id){sealFrame=id;refreshSealBuilder();}
+function setSealSymbol(id){sealSymbol=id;refreshSealBuilder();}
+function setSealOrnament(id){sealOrnament=id;refreshSealBuilder();}
+
+function refreshSealBuilder(){
+  buildSealPartGrid('seal-frame-grid',   SEAL_FRAMES,   sealFrame,   'setSealFrame',   sealColorFrame);
+  buildSealColorRow('seal-frame-colors',   'frame',   sealColorFrame);
+  buildSealPartGrid('seal-symbol-grid',  SEAL_SYMBOLS,  sealSymbol,  'setSealSymbol',  sealColorSymbol);
+  buildSealColorRow('seal-symbol-colors',  'symbol',  sealColorSymbol);
+  buildSealPartGrid('seal-ornament-grid',SEAL_ORNAMENTS,sealOrnament,'setSealOrnament',sealColorOrnament);
+  buildSealColorRow('seal-ornament-colors','ornament',sealColorOrnament);
+  const svg=buildSealSVG();
+  const preview=document.getElementById('seal-preview-svg');
+  if(preview) preview.innerHTML=svg.replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,'');
+  // 奥付プレビューにも反映
+  const mark=document.getElementById('col-preview-mark');
+  if(mark){
+    mark.innerHTML=`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px;vertical-align:middle;">${svg.replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,'')}</svg>`;
+  }
+}
+
+function renderStoryList(){
+  const list=document.getElementById('story-list');
+  if(!list)return;
+  if(!stories.length){
+    list.innerHTML='<div class="empty" style="padding:0.8rem 0;"><div class="empty-icon">📜</div><div class="empty-text">ストーリーがありません</div></div>';
+    return;
+  }
+  list.innerHTML=stories.slice().sort((a,b)=>b.updatedAt-a.updatedAt).map(s=>{
+    const finished=!!s.finishedAt;
+    const mark=s.colophon?.mark||'';
+    const author=s.colophon?.author?`著者：${escHtml(s.colophon.author)}`:'';
+    const date=new Date(s.updatedAt||s.createdAt).toLocaleDateString('ja-JP');
+    const chars=(s.body||'').length;
+    if(finished){
+      const sealHtml=mark
+        ? mark.replace('<svg ','<svg style="width:52px;height:52px;display:block;" ')
+        : '';
+      return `<div class="story-card finished" onclick="openStory('${s.id}')">
+        <div style="display:flex;align-items:center;gap:0.8rem;">
+          <div style="flex:1;min-width:0;">
+            <div class="story-finished-label">Manuscript</div>
+            <div class="story-card-title">${escHtml(s.title||'無題')}</div>
+            <div class="story-card-meta">${date} ・ ${chars}字${author?' ・ '+author:''}</div>
+            <div class="story-seal">Nóstoi-Grimoire</div>
+          </div>
+          ${sealHtml?`<div style="flex-shrink:0;opacity:0.85;">${sealHtml}</div>`:''}
+        </div>
+      </div>`;
+    }
+    return `<div class="story-card" onclick="openStory('${s.id}')">
+      <div class="story-card-title">${escHtml(s.title||'無題')}</div>
+      <div class="story-card-meta">${date} ・ ${chars}字</div>
+    </div>`;
+  }).join('');
+}
+
+function showStoryCreate(){
+  currentStoryId=null;
+  storyCharIds=[];
+  storySessionRefs=[];
+  storyIsVertical=false;
+  storyIsFullscreen=false;
+  document.getElementById('story-title').value='';
+  document.getElementById('story-body').value='';
+  document.getElementById('story-fullscreen').style.display='none';
+  applyVertical();
+  updateStoryStats();
+  renderStoryCharChips();
+  renderStorySessionChips();
+  loadTerms();
+  startStoryAutoSave();
+  showView('story-edit-view');
+}
+
+function openStory(id){
+  const s=stories.find(s=>s.id===id); if(!s)return;
+  currentStoryId=id;
+  storyCharIds=[...(s.charIds||[])];
+  storySessionRefs=[...(s.sessionRefs||[])];
+  storyIsVertical=s.isVertical||false;
+  storyIsFullscreen=false;
+  document.getElementById('story-title').value=s.title||'';
+  document.getElementById('story-body').value=s.body||'';
+  document.getElementById('story-fullscreen').style.display='none';
+  applyVertical();
+  updateStoryStats();
+  renderStoryCharChips();
+  renderStorySessionChips();
+  loadTerms();
+  startStoryAutoSave();
+  showView('story-edit-view');
+}
+
+function backFromStory(){
+  saveStoryDraft();
+  stopStoryAutoSave();
+  clearTimeout(window._storyAutoSaveTimer);
+  showView('char-list-view');
+  renderStoryList();
+}
+
+function saveStoryDraft(){
+  const title=document.getElementById('story-title').value.trim();
+  const body=document.getElementById('story-body').value;
+  if(!title&&!body)return;
+  const patch={title,body,charIds:storyCharIds,sessionRefs:storySessionRefs,isVertical:storyIsVertical,updatedAt:Date.now()};
+  if(currentStoryId){
+    const s=stories.find(s=>s.id===currentStoryId);
+    if(s) Object.assign(s,patch);
+  } else {
+    const newStory={id:'st_'+Date.now(),...patch,createdAt:Date.now()};
+    stories.push(newStory);
+    currentStoryId=newStory.id;
+  }
+  localStorage.setItem(KEY_STORIES,JSON.stringify(stories));
+}
+
+function renderStoryCharChips(){
+  const el=document.getElementById('story-char-list'); if(!el)return;
+  el.innerHTML=storyCharIds.map(id=>{
+    const c=characters.find(c=>c.id===id);
+    return c?`<span class="story-char-chip">${escHtml(c.name||'名称不明')}<span onclick="removeStoryChar('${id}')" style="cursor:pointer;color:var(--parchment-dk);margin-left:0.3rem;">×</span></span>`:'';
+  }).join('');
+}
+
+function removeStoryChar(id){
+  storyCharIds=storyCharIds.filter(i=>i!==id);
+  renderStoryCharChips();
+}
+
+function openStoryCharPicker(){
+  if(!characters.length){gmAlert('キャラクターがいません');return;}
+  const items=characters.filter(c=>!storyCharIds.includes(c.id)).map(c=>
+    `<div class="session-card" onclick="addStoryChar('${c.id}')">
+      <span class="session-card-name">${escHtml(c.name||'名称不明')}</span>
+      <span class="session-card-arrow">＋</span>
+    </div>`
+  ).join('');
+  const body=items||'<div class="empty"><div class="empty-text">追加できるキャラクターがいません</div></div>';
+  showCustomModal('キャラクターを登録', body, []);
+}
+
+function addStoryChar(id){
+  if(!storyCharIds.includes(id)) storyCharIds.push(id);
+  closeCustomModal();
+  renderStoryCharChips();
+}
+
+function renderStorySessionChips(){
+  const el=document.getElementById('story-session-list'); if(!el)return;
+  if(!storySessionRefs.length){
+    el.innerHTML='<div style="font-size:0.75rem;color:var(--parchment-dk);">引用セッションなし</div>';
+    return;
+  }
+  el.innerHTML=storySessionRefs.map((ref,i)=>`
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:0.5rem 0.7rem;margin-bottom:0.4rem;font-size:0.78rem;">
+      <div style="display:flex;align-items:center;gap:0.4rem;">
+        <span style="color:var(--parchment);">${escHtml(ref.charName)}</span>
+        <span style="color:var(--parchment-dk);">・</span>
+        <span style="color:var(--ink-dim);">${escHtml(ref.session||'（名称なし）')}</span>
+        <span style="margin-left:auto;color:var(--parchment-dk);cursor:pointer;" onclick="removeSessionRef(${i})">×</span>
+      </div>
+      <div style="color:var(--ink-dim);margin-top:0.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(ref.preview)}</div>
+    </div>`).join('');
+}
+
+function removeSessionRef(i){
+  storySessionRefs.splice(i,1);
+  renderStorySessionChips();
+}
+
+let _sessionPickerItems=[];
+function openSessionPicker(){
+  _sessionPickerItems=[];
+  let html='';
+  characters.forEach(c=>{
+    const sessions=[...new Set(roles.filter(r=>r.charId===c.id).map(r=>r.session||''))];
+    if(!sessions.length)return;
+    html+=`<div style="font-size:0.7rem;letter-spacing:0.15em;color:var(--accent);margin:0.6rem 0 0.3rem;">${escHtml(c.name||'名称不明')}</div>`;
+    sessions.forEach(s=>{
+      const preview=roles.filter(r=>r.charId===c.id&&(r.session||'')===s).map(r=>r.body).join(' ').slice(0,60);
+      const idx=_sessionPickerItems.length;
+      _sessionPickerItems.push({charId:c.id,session:s,preview});
+      html+=`<div class="session-card" style="font-size:0.8rem;" onclick="_addSessionRefByIdx(${idx})">
+        <span class="session-card-name">${escHtml(s||'（名称なし）')}</span>
+        <span class="session-card-arrow">＋</span>
+      </div>`;
+    });
+  });
+  if(!html) html='<div class="empty"><div class="empty-text">読み込めるセッションがありません</div></div>';
+  showCustomModal('セッションを読み込む', html, []);
+}
+
+function addSessionRef(charId,session,preview){
+  const c=characters.find(c=>c.id===charId);
+  storySessionRefs.push({charId,charName:c?c.name:'',session,preview});
+  closeCustomModal();
+  renderStorySessionChips();
+}
+function _addSessionRefByIdx(idx){
+  const item=_sessionPickerItems[idx]; if(!item)return;
+  addSessionRef(item.charId,item.session,item.preview);
+}
+
+function saveStoryJSON(){
+  const body=document.getElementById('story-body').value;
+  if(!body.trim()){gmAlert('本文が空欄です。中途保存できません。');return;}
+  saveStoryDraft();
+  const s=stories.find(s=>s.id===currentStoryId); if(!s)return;
+  downloadJSON(s,`story_${s.title||'untitled'}_${Date.now()}.json`);
+}
+
+function exportStoryPDF(){
+  saveStoryDraft();
+  const title=document.getElementById('story-title').value.trim()||'無題';
+  const body=document.getElementById('story-body').value;
+  if(!body.trim()){gmAlert('本文が空欄です');return;}
+  const story=stories.find(s=>s.id===currentStoryId)||null;
+  _printStory(title,body,story,storyIsVertical);
+}
+
+function _parseBody(rawBody){
+  const lines=rawBody.split('\n');
+  let html='';
+  lines.forEach(line=>{
+    const t=line.trim();
+    if(t==='※※※'){html+='<div class="pb"></div>';return;}
+    if(/^【.+】$/.test(t)){html+=`<h1 class="pt">${_rubyHtml(t.slice(1,-1))}</h1>`;return;}
+    if(/^第.+章/.test(t)){html+=`<h2 class="ch">${_rubyHtml(t)}</h2>`;return;}
+    if(/^第.+節/.test(t)){html+=`<h3 class="sc">${_rubyHtml(t)}</h3>`;return;}
+    if(/^◆/.test(t)){html+='<p class="scene">◆</p>';return;}
+    if(t===''){html+='<p class="blank"> </p>';return;}
+    html+=`<p>${_rubyHtml(line)}</p>`;
+  });
+  return html;
+}
+
+function _rubyHtml(str){
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return esc(str).replace(/｜([^《]+)《([^》]+)》/g,(_,b,r)=>`<ruby>${b}<rt>${r}</rt></ruby>`);
+}
+
+function _printStory(title,rawBody,story,vertical){
+  const bodyHtml=_parseBody(rawBody);
+  const isVert=vertical;
+  const author=story?.colophon?.author||'';
+  const date=story?.colophon?.date?new Date(story.colophon.date).toLocaleDateString('ja-JP'):'';
+  // 保存済みcolophon.markを使用（buildSealSVG()はグローバル変数依存で不正確）
+  const sealMark=story?.colophon?.mark||'';
+  const sealSeal=story?.colophon?.seal||'';
+  const sealPrint=sealMark?sealMark.replace('<svg ','<svg style="width:70px;height:70px;display:block;" '):'';
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  const colophonHtml=story?.colophon?`
+    <div class="colophon">
+      <div class="colophon-title">― 奥　付 ―</div>
+      ${sealPrint?`<div class="colophon-svg">${sealPrint}</div>`:''}
+      ${author?`<div class="colophon-author">著者　${esc(author)}</div>`:''}
+      ${date?`<div class="colophon-date">${date}</div>`:''}
+      <div class="colophon-seal">${esc(sealSeal)}</div>
+    </div>`:'';
+
+  const fontImport=isOnline
+    ? "@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap');"
+    : '';
+  const style=`
+    ${fontImport}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:${isOnline?"'Noto Serif JP',":''}'serif','游明朝','Hiragino Mincho ProN','MS Mincho',serif;font-size:10.5pt;line-height:2;color:#1a1208;background:#fff;${isVert?'writing-mode:vertical-rl;text-orientation:upright;':''}}
+    .print-wrap{${isVert?'max-height:calc(100vh - 40mm);padding:20mm;':'max-width:160mm;margin:0 auto;padding:20mm 0;'}}
+    .title-page{min-height:calc(100vh - 40mm);display:flex;flex-direction:column;align-items:center;justify-content:center;page-break-after:always;}
+    .title-page h1{font-size:20pt;font-weight:700;letter-spacing:.2em;margin-bottom:.8em;}
+    .title-page .tp-author{font-size:10pt;letter-spacing:.15em;color:#5a3a10;}
+    p{text-indent:1em;margin:0;}
+    p.blank{height:.8em;text-indent:0;}
+    p.scene{text-align:center;text-indent:0;letter-spacing:.5em;margin:1em 0;}
+    h1.pt{font-size:16pt;text-align:center;text-indent:0;margin:2em 0 1.5em;font-weight:700;letter-spacing:.2em;}
+    h2.ch{font-size:13pt;text-indent:0;margin:2em 0 1em;font-weight:700;border-bottom:1px solid #b88040;padding-bottom:.3em;}
+    h3.sc{font-size:11pt;text-indent:0;margin:1.5em 0 .8em;font-weight:700;}
+    ruby rt{font-size:.5em;}
+    .pb{page-break-after:always;height:0;}
+    .colophon{page-break-before:always;min-height:40mm;margin-top:40mm;display:flex;flex-direction:column;align-items:center;gap:.8em;padding-top:20mm;}
+    .colophon-title{font-size:9pt;letter-spacing:.3em;color:#8a6020;}
+    .colophon-svg{margin:.5em 0;}
+    .colophon-author{font-size:10pt;letter-spacing:.15em;}
+    .colophon-date{font-size:9pt;color:#6a4a18;letter-spacing:.1em;}
+    .colophon-seal{font-size:8pt;letter-spacing:.2em;color:#8a6020;}
+    @media screen{#_print-layer{position:fixed;inset:0;background:#fff;z-index:9999;overflow-y:auto;padding:10mm;}}
+    @media print{#_print-layer{position:static;padding:0;}body>*:not(#_print-layer){display:none!important;}}
+  `;
+
+  // 既存レイヤーがあれば除去
+  document.getElementById('_print-layer')?.remove();
+  document.getElementById('_print-close')?.remove();
+  document.getElementById('_print-btn')?.remove();
+
+  const layer=document.createElement('div');
+  layer.id='_print-layer';
+  layer.innerHTML=`<style>${style}</style><div class="print-wrap"><div class="title-page"><h1>${_rubyHtml(title)}</h1>${author?`<div class="tp-author">${author}</div>`:''}</div><div class="body-content">${bodyHtml}</div>${colophonHtml}</div>`;
+  document.body.appendChild(layer);
+
+  // オンライン/オフライン案内バナー
+  const notice=document.createElement('div');
+  notice.style.cssText='position:fixed;bottom:0;left:0;right:0;z-index:10000;background:#1e0f04;border-top:1px solid #b88040;padding:6px 14px;font-size:11px;color:#c8a060;letter-spacing:0.05em;display:flex;align-items:center;gap:1em;flex-wrap:wrap;';
+  if(isOnline){
+    notice.innerHTML='<span>● <strong>ONLINEモード</strong>：Noto Serif JP フォントが適用されます。読み込み完了後に印刷してください。</span>';
+  } else {
+    notice.innerHTML='<span>○ <strong>OFFLINEモード</strong>：フォントは端末のシステムフォント（游明朝 / Hiragino Mincho 等）で代替されます。ONLINEモードでは Noto Serif JP が使用されます。</span>';
+  }
+  document.body.appendChild(notice);
+
+  const mkBtn=(id,label,right,bg,fg,cb)=>{
+    const b=document.createElement('button');
+    b.id=id; b.textContent=label;
+    b.style.cssText=`position:fixed;top:10px;right:${right}px;z-index:10000;padding:6px 14px;background:${bg};color:${fg};border:1px solid #b88040;font-size:11px;cursor:pointer;border-radius:2px;`;
+    b.onclick=cb; document.body.appendChild(b); return b;
+  };
+  const closeAll=()=>{layer.remove();notice.remove();document.getElementById('_print-close')?.remove();document.getElementById('_print-btn')?.remove();};
+  mkBtn('_print-btn','🖨 印刷 / PDF保存',140,'#7a3a08','#f0d090',()=>window.print());
+  mkBtn('_print-close','✕ 閉じる',10,'#2a1a08','#d4aa60',closeAll);
+}
+
+function goColophon(){
+  const title=document.getElementById('story-title').value.trim();
+  if(!title){gmAlert('タイトルを入力してください');return;}
+  saveStoryDraft();
+  // 奥付画面初期化
+  document.getElementById('col-author').value='';
+  document.getElementById('col-use-date').checked=true;
+  sealFrame='circle'; sealSymbol='cross'; sealOrnament='none';
+  sealColorFrame='#c09040'; sealColorSymbol='#c09040'; sealColorOrnament='#c09040';
+  refreshSealBuilder();
+  updateColophonPreview();
+  // イベントはHTML側のoninput/onchangeで処理（重複登録防止）
+  showView('story-colophon-view');
+  // スクロールをページ先頭に戻す
+  const view=document.getElementById('story-colophon-view');
+  if(view) view.scrollTop=0;
+  window.scrollTo(0,0);
+}
+
+function backFromColophon(){
+  showView('story-edit-view');
+}
+
+function buildColophonMarkGrid(){
+  // 新方式: SVGビルダーに委譲
+  refreshSealBuilder();
+}
+
+function updateColophonPreview(){
+  refreshSealBuilder();
+  const author=document.getElementById('col-author').value.trim();
+  document.getElementById('col-preview-author').textContent=author?`著者：${author}`:'（著者未入力）';
+  const useDate=document.getElementById('col-use-date').checked;
+  document.getElementById('col-preview-date').textContent=useDate?new Date().toLocaleDateString('ja-JP'):'';
+}
+
+function finishStory(){
+  const author=document.getElementById('col-author').value.trim();
+  const useDate=document.getElementById('col-use-date').checked;
+  const s=stories.find(s=>s.id===currentStoryId); if(!s)return;
+  const doFinish=()=>{
+    // stories配列を更新してlocalStorageに永続化
+    s.colophon={
+      author,
+      mark:buildSealSVG(),
+      sealParts:{frame:sealFrame,symbol:sealSymbol,ornament:sealOrnament,colorFrame:sealColorFrame,colorSymbol:sealColorSymbol,colorOrnament:sealColorOrnament},
+      date:useDate?new Date().toISOString():null,
+      seal:'ノストイ叙事詩環　Nóstoi-Grimoire'
+    };
+    s.finishedAt=Date.now();
+    s.updatedAt=Date.now();
+    localStorage.setItem(KEY_STORIES,JSON.stringify(stories));
+    downloadJSON(s,`manuscript_${s.title||'untitled'}_${Date.now()}.json`);
+    stopStoryAutoSave();
+    gmAlert('写本が完成しました。');
+    showView('char-list-view');
+    renderStoryList();
+  };
+  if(!author){
+    gmConfirm('著者名が空欄です。本当によろしいですか？',doFinish);
+  } else {
+    doFinish();
+  }
+}
+
+// カスタムモーダル簡易版（既存のgmModal基盤を使用）
+function showCustomModal(title, bodyHtml, buttons){
+  let el=document.getElementById('_custom-picker-modal');
+  if(!el){
+    el=document.createElement('div');
+    el.id='_custom-picker-modal';
+    el.className='modal-overlay';
+    el.innerHTML='<div class="modal" style="max-height:70vh;overflow:hidden;display:flex;flex-direction:column;"><div class="modal-title" id="_cpm-title"></div><div id="_cpm-body" style="overflow-y:auto;flex:1;"></div><div class="btn-row" style="margin-top:0.8rem;"><button class="btn btn-g" onclick="closeCustomModal()">閉じる</button></div></div>';
+    document.body.appendChild(el);
+    // 背景クリックで閉じる
+    el.addEventListener('click',e=>{if(e.target===el)closeCustomModal();});
+  }
+  document.getElementById('_cpm-title').textContent=title;
+  document.getElementById('_cpm-body').innerHTML=bodyHtml;
+  el.classList.add('open');
+}
+function closeCustomModal(){
+  const el=document.getElementById('_custom-picker-modal');
+  if(el) el.classList.remove('open');
+}
+
+
+// ── ストーリーエディタ機能 ──
+let storyIsFullscreen=false;
+let storyIsVertical=false;
+const KEY_VERT_NOTIFIED='gm_vert_notified';
+let storyVertNotified=JSON.parse(localStorage.getItem(KEY_VERT_NOTIFIED)||'{}');
+
+// 全画面トグル
+function toggleStoryFullscreen(){
+  // 縦書きpreviewをいったん全て除去してから切り替え
+  ['story-vert-preview','story-vert-preview-fs'].forEach(id=>{
+    document.getElementById(id)?.remove();
+  });
+
+  storyIsFullscreen=!storyIsFullscreen;
+  const fs=document.getElementById('story-fullscreen');
+  const btn=document.getElementById('story-fs-btn');
+  const main=document.getElementById('story-body');
+  const fsta=document.getElementById('story-body-fs');
+
+  if(storyIsFullscreen){
+    if(main&&fsta) fsta.value=main.value;
+    main.style.display=''; // 念のためリセット
+    fs.style.display='flex';
+    if(btn) btn.textContent='縮小';
+    setTimeout(()=>fsta&&fsta.focus(),50);
+  } else {
+    if(main&&fsta) main.value=fsta.value;
+    fsta.style.display=''; // 念のためリセット
+    fs.style.display='none';
+    if(btn) btn.textContent='全画面';
+  }
+  updateStoryStats();
+  applyVertical();
+}
+
+// 本文同期: from='fs'→通常に反映、from='main'→FSに反映
+function syncStoryBody(from){
+  const main=document.getElementById('story-body');
+  const fs=document.getElementById('story-body-fs');
+  if(from==='fs'&&main&&fs) main.value=fs.value;
+  else if(from==='main'&&main&&fs) fs.value=main.value;
+  updateStoryStats();
+}
+
+// 統計更新
+function updateStoryStats(){
+  // 通常とFS、どちらも最新のテキストを取得
+  const mainTA=document.getElementById('story-body');
+  const fsTA=document.getElementById('story-body-fs');
+  const text=(mainTA?mainTA.value:'');
+  const chars=text.length;
+  const spaces=(text.match(/[ 　]/g)||[]).length;
+  const lines=(text.match(/\n/g)||[]).length;
+  const unit=parseInt(document.getElementById('nm-page-unit')?.value||'400');
+  const pages=Math.max(1,Math.ceil((chars-spaces)/unit));
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  // 全画面バー（同じunit使用）
+  set('fs-chars',chars); set('fs-spaces',spaces); set('fs-lines',lines); set('fs-pages',pages);
+  // 通常モードバー
+  set('nm-chars',chars); set('nm-spaces',spaces); set('nm-lines',lines); set('nm-pages',pages);
+  // 用語ゆれチェック（パフォーマンスのためdebounce）
+  clearTimeout(window._termCheckTimer);
+  window._termCheckTimer=setTimeout(()=>checkTermWarnings(text),500);
+  // アウトライン更新
+  if(document.getElementById('story-outline-panel')?.style.display!=='none') renderOutline();
+}
+
+function onStoryBodyInput(){
+  if(storyIsFullscreen){
+    document.getElementById('story-body-fs').value=document.getElementById('story-body').value;
+  }
+  updateStoryStats();
+  if(storyIsVertical) applyVertical();
+}
+
+function onFsBodyInput(){
+  syncStoryBody('fs');
+  if(storyIsVertical) applyVertical();
+}
+
+// アクティブなテキストエリアを取得
+function getActiveTA(){
+  return storyIsFullscreen
+    ? document.getElementById('story-body-fs')
+    : document.getElementById('story-body');
+}
+
+// カーソル位置にテキスト挿入
+function insertAtCursor(text){
+  const ta=getActiveTA(); if(!ta)return;
+  const s=ta.selectionStart, e=ta.selectionEnd;
+  ta.value=ta.value.slice(0,s)+text+ta.value.slice(e);
+  ta.selectionStart=ta.selectionEnd=s+text.length;
+  ta.focus();
+  syncStoryBody(storyIsFullscreen?'fs':'main');
+  updateStoryStats();
+  if(storyIsVertical) applyVertical();
+}
+
+// 字下げ：カーソル行の行頭に全角空白を挿入
+function insertIndent(){
+  const ta=getActiveTA(); if(!ta)return;
+  const selStart=ta.selectionStart, selEnd=ta.selectionEnd;
+  const val=ta.value;
+  // 選択範囲全体をカバーする行の開始位置を特定
+  const blockStart=val.lastIndexOf('\n',selStart-1)+1;
+  const blockEnd=selEnd;
+  const block=val.slice(blockStart,blockEnd);
+  const indented=block.replace(/(^|\n)/g,'$1　');
+  const added=indented.length-block.length; // 追加された文字数
+  ta.value=val.slice(0,blockStart)+indented+val.slice(blockEnd);
+  ta.selectionStart=selStart+1; // 少なくとも1文字ずれる
+  ta.selectionEnd=selEnd+added;
+  ta.focus();
+  syncStoryBody(storyIsFullscreen?'fs':'main');
+  updateStoryStats();
+  if(storyIsVertical) applyVertical();
+}
+
+// ルビモーダルを開く
+function openRubyModal(){
+  const ta=getActiveTA();
+  const selected=ta?ta.value.slice(ta.selectionStart,ta.selectionEnd):'';
+  document.getElementById('ruby-base').value=selected;
+  document.getElementById('ruby-text').value='';
+  openModal('modal-ruby');
+}
+
+// ルビ挿入
+function insertRuby(){
+  const base=document.getElementById('ruby-base').value;
+  const ruby=document.getElementById('ruby-text').value;
+  if(!base||!ruby){gmAlert('対象テキストとルビを入力してください');return;}
+  insertAtCursor(`｜${base}《${ruby}》`);
+  closeModal('modal-ruby');
+}
+
+// 改ページ
+function insertPageBreak(){
+  insertAtCursor('\n※※※\n');
+}
+
+// 縦書き切替
+function toggleVertical(){
+  const isFirst=currentStoryId&&!storyVertNotified[currentStoryId];
+  const doToggle=()=>{
+    storyIsVertical=!storyIsVertical;
+    if(currentStoryId){
+      storyVertNotified[currentStoryId]=true;
+      localStorage.setItem(KEY_VERT_NOTIFIED,JSON.stringify(storyVertNotified));
+    }
+    applyVertical();
+  };
+  if(!storyIsVertical&&isFirst){
+    // 初回のみ確認
+    gmConfirmSingle('縦書き表示はプレビュー用です。PDF出力時のみ完成稿に適用されます。',doToggle);
+  } else {
+    doToggle();
+  }
+}
+
+// 縦書き: textareaを隠してpreviewDivで表示（モバイルでwriting-modeが効かないため）
+function applyVertical(){
+  const ta1=document.getElementById('story-body');
+  const ta2=document.getElementById('story-body-fs');
+  const label1=document.getElementById('story-vert-btn');
+  const label2=document.getElementById('story-vert-btn-fs');
+  const label=storyIsVertical?'縦書き':'横書き';
+  if(label1){label1.textContent=label;label1.classList.toggle('active',storyIsVertical);}
+  if(label2){label2.textContent=label;label2.classList.toggle('active',storyIsVertical);}
+
+  if(storyIsVertical){
+    const activeTA=storyIsFullscreen?ta2:ta1;
+    const prevId=storyIsFullscreen?'story-vert-preview-fs':'story-vert-preview';
+    if(activeTA) activeTA.style.display='none';
+    let prev=document.getElementById(prevId);
+    if(!prev){
+      prev=document.createElement('div');
+      prev.id=prevId;
+      prev.style.cssText='writing-mode:vertical-rl;text-orientation:upright;overflow-x:auto;overflow-y:hidden;background:var(--bg3);border:1px solid var(--border);border-radius:0 0 2px 2px;padding:1rem;font-size:0.88rem;line-height:2.1;color:var(--ink);font-family:var(--font-serif);white-space:pre-wrap;min-height:260px;max-height:60vh;';
+      if(activeTA) activeTA.parentNode.insertBefore(prev,activeTA.nextSibling);
+    }
+    // 常に最新テキストを反映
+    if(activeTA){
+      prev.textContent='';
+      // ルビ記法をHTMLとして展開
+      const html=_rubyHtml(activeTA.value);
+      prev.innerHTML=html.replace(/\n/g,'<br>');
+      prev.style.display='block';
+    }
+  } else {
+    // 横書きに戻す: previewDivをDOMから除去してtextareaを復元
+    ['story-vert-preview','story-vert-preview-fs'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.remove(); // display:noneではなく完全除去
+    });
+    if(ta1) ta1.style.display='';
+    if(ta2) ta2.style.display='';
+  }
+}
+
+// タイトル挿入
+function insertTitle(){
+  const title=document.getElementById('story-title').value.trim()||'無題';
+  insertAtCursor(`\n【${title}】\n`);
+}
+
+// 章・節挿入モーダル
+let _savedSel={start:0,end:0};
+function insertChapter(){
+  const ta=getActiveTA();
+  if(ta){_savedSel={start:ta.selectionStart,end:ta.selectionEnd};}
+  showCustomModal('章・節を挿入',
+    `<div style="display:flex;flex-direction:column;gap:0.5rem;padding:0.3rem 0;">
+      <button class="session-card" onmousedown="event.preventDefault()" onclick="doInsertChapter('chapter')"><span class="session-card-name">第◯章</span><span class="session-card-arrow">＋</span></button>
+      <button class="session-card" onmousedown="event.preventDefault()" onclick="doInsertChapter('section')"><span class="session-card-name">第◯節</span><span class="session-card-arrow">＋</span></button>
+      <button class="session-card" onmousedown="event.preventDefault()" onclick="doInsertChapter('scene')"><span class="session-card-name">◆ 場面転換</span><span class="session-card-arrow">＋</span></button>
+    </div>`,[]
+  );
+}
+
+function doInsertChapter(type){
+  closeCustomModal();
+  const map={chapter:'第◯章',section:'第◯節',scene:'◆'};
+  const ta=getActiveTA(); if(!ta)return;
+  // 保存した選択位置を復元して挿入
+  ta.selectionStart=_savedSel.start;
+  ta.selectionEnd=_savedSel.end;
+  const text=`\n\n${map[type]}\n`;
+  const s=ta.selectionStart,e=ta.selectionEnd;
+  ta.value=ta.value.slice(0,s)+text+ta.value.slice(e);
+  ta.selectionStart=ta.selectionEnd=s+text.length;
+  ta.focus();
+  syncStoryBody(storyIsFullscreen?'fs':'main');
+  updateStoryStats();
+  if(storyIsVertical) applyVertical();
+}
+
+// 確認（選択肢が「確認」のみ）
+function gmConfirmSingle(msg, cb){
+  const overlay=document.createElement('div');
+  overlay.className='modal-overlay open';
+  overlay.innerHTML=`<div class="modal"><div class="modal-message" style="margin-bottom:1.2rem;font-size:0.85rem;line-height:1.9;color:var(--ink);">${msg}</div><div class="btn-row"><button class="btn btn-p" id="_gcs_ok">確認</button></div></div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#_gcs_ok').onclick=()=>{overlay.remove();cb&&cb();};
+}
+
+
+// ══ ストーリー：検索・置換 ══
+let _searchIdx=-1;
+let _searchMatches=[];
+
+function openStorySearch(){
+  _searchIdx=-1; _searchMatches=[];
+  document.getElementById('search-find').value='';
+  document.getElementById('search-replace').value='';
+  document.getElementById('search-result-info').textContent='';
+  openModal('modal-story-search');
+}
+
+function storySearchFind(){
+  const ta=getActiveTA(); if(!ta)return;
+  const q=document.getElementById('search-find').value;
+  if(!q){document.getElementById('search-result-info').textContent='検索文字列を入力してください';return;}
+  const text=ta.value;
+  _searchMatches=[];
+  let idx=0;
+  while(true){
+    const pos=text.indexOf(q,idx);
+    if(pos===-1)break;
+    _searchMatches.push(pos);
+    idx=pos+1;
+  }
+  if(!_searchMatches.length){
+    document.getElementById('search-result-info').textContent='見つかりませんでした';
+    _searchIdx=-1; return;
+  }
+  _searchIdx=(_searchIdx+1<_searchMatches.length)?_searchIdx+1:0;
+  _highlightSearchMatch(ta,q);
+}
+
+function _highlightSearchMatch(ta,q){
+  if(_searchIdx<0||!_searchMatches.length)return;
+  const pos=_searchMatches[_searchIdx];
+  ta.focus();
+  ta.setSelectionRange(pos,pos+q.length);
+  // スクロール位置の近似
+  const linesBefore=(ta.value.slice(0,pos).match(/\n/g)||[]).length;
+  const lineH=parseFloat(getComputedStyle(ta).lineHeight)||20;
+  ta.scrollTop=Math.max(0,linesBefore*lineH-ta.clientHeight/2);
+  const info=document.getElementById('search-result-info');
+  if(info) info.textContent=`${_searchMatches.length}件中 ${_searchIdx+1}件目`;
+}
+
+function storySearchReplace(){
+  const ta=getActiveTA(); if(!ta)return;
+  const q=document.getElementById('search-find').value;
+  const r=document.getElementById('search-replace').value;
+  if(!q||_searchIdx<0||!_searchMatches.length){storySearchFind();return;}
+  const pos=_searchMatches[_searchIdx];
+  ta.value=ta.value.slice(0,pos)+r+ta.value.slice(pos+q.length);
+  syncStoryBody(storyIsFullscreen?'fs':'main');
+  updateStoryStats();
+  // 再検索
+  _searchMatches=[];
+  _searchIdx=-1;
+  storySearchFind();
+}
+
+function storySearchReplaceAll(){
+  const ta=getActiveTA(); if(!ta)return;
+  const q=document.getElementById('search-find').value;
+  const r=document.getElementById('search-replace').value;
+  if(!q)return;
+  const count=(ta.value.split(q).length-1);
+  if(!count){document.getElementById('search-result-info').textContent='見つかりませんでした';return;}
+  ta.value=ta.value.split(q).join(r);
+  syncStoryBody(storyIsFullscreen?'fs':'main');
+  updateStoryStats();
+  if(storyIsVertical) applyVertical();
+  document.getElementById('search-result-info').textContent=`${count}件を置換しました`;
+}
+
+// ══ ストーリー：章アウトライン ══
+function toggleOutline(){
+  const panel=document.getElementById('story-outline-panel');
+  const btn=document.getElementById('story-outline-btn');
+  if(!panel)return;
+  const isOpen=panel.style.display!=='none';
+  panel.style.display=isOpen?'none':'block';
+  if(btn)btn.classList.toggle('active',!isOpen);
+  if(!isOpen)renderOutline();
+}
+
+function renderOutline(){
+  const panel=document.getElementById('story-outline-panel'); if(!panel)return;
+  const ta=getActiveTA();
+  const text=ta?ta.value:'';
+  const lines=text.split('\n');
+  const items=[];
+  let charCount=0;
+  lines.forEach((line,i)=>{
+    if(/^(第.+[章節]|◆|【.+】)/.test(line.trim())){
+      items.push({label:line.trim(),pos:charCount});
+    }
+    charCount+=line.length+1;
+  });
+  if(!items.length){
+    panel.innerHTML='<span style="font-size:0.72rem;color:var(--parchment-dk);">章・節・タイトルマーカーがありません</span>';
+    return;
+  }
+  panel.innerHTML=items.map(item=>`
+    <div style="padding:0.2rem 0.4rem;font-size:0.75rem;color:var(--parchment);cursor:pointer;border-radius:2px;transition:background 0.1s;" 
+         onmouseover="this.style.background='rgba(184,115,51,0.1)'" onmouseout="this.style.background=''"
+         onclick="jumpToOutlinePos(${item.pos})">${escHtml(item.label)}</div>`).join('');
+}
+
+function jumpToOutlinePos(pos){
+  const ta=getActiveTA(); if(!ta)return;
+  ta.focus(); ta.selectionStart=pos; ta.selectionEnd=pos;
+  const ratio=pos/Math.max(1,ta.value.length);
+  ta.scrollTop=ta.scrollHeight*ratio;
+  // 縦書きプレビュー更新
+  if(storyIsVertical) applyVertical();
+}
+
+// ══ ストーリー：用語・表記ゆれ管理 ══
+let storyTerms=[]; // [{correct:'ノストイ', variants:['ノストイ','nostoi']}, ...]
+const KEY_STORY_TERMS='gm_story_terms';
+
+function loadTerms(){
+  storyTerms=JSON.parse(localStorage.getItem(KEY_STORY_TERMS)||'[]');
+}
+
+function saveTerms(){
+  localStorage.setItem(KEY_STORY_TERMS,JSON.stringify(storyTerms));
+}
+
+function openTermManager(){
+  loadTerms();
+  renderTermList();
+  openModal('modal-term-manager');
+}
+
+function renderTermList(){
+  const el=document.getElementById('term-list'); if(!el)return;
+  if(!storyTerms.length){
+    el.innerHTML='<div style="font-size:0.75rem;color:var(--parchment-dk);padding:0.3rem 0;">登録された用語がありません</div>';
+    return;
+  }
+  el.innerHTML=storyTerms.map((t,i)=>`
+    <div style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:0.78rem;color:var(--parchment);flex:1;">
+        <strong>${escHtml(t.correct)}</strong>
+        <span style="color:var(--ink-dim);font-size:0.68rem;"> / ${escHtml((t.variants||[]).join(', '))}</span>
+      </span>
+      <button class="btn btn-d btn-sm" onclick="removeTerm(${i})">削除</button>
+    </div>`).join('');
+}
+
+function addTerm(){
+  const correct=document.getElementById('term-correct').value.trim();
+  const varRaw=document.getElementById('term-variants').value.trim();
+  if(!correct){gmAlert('正式表記を入力してください');return;}
+  const variants=varRaw?varRaw.split(',').map(v=>v.trim()).filter(Boolean):[];
+  storyTerms.push({correct,variants});
+  saveTerms();
+  renderTermList();
+  document.getElementById('term-correct').value='';
+  document.getElementById('term-variants').value='';
+}
+
+function removeTerm(i){
+  storyTerms.splice(i,1);
+  saveTerms();
+  renderTermList();
+}
+
+function checkTermWarnings(text){
+  loadTerms();
+  const setWarn=(id,html)=>{
+    const el=document.getElementById(id); if(!el)return;
+    if(html){el.style.display='block';el.innerHTML=html;}
+    else el.style.display='none';
+  };
+  if(!storyTerms.length){
+    setWarn('story-term-warn',null);
+    setWarn('story-term-warn-fs',null);
+    return;
+  }
+  const hits=[];
+  storyTerms.forEach(t=>{
+    (t.variants||[]).forEach(v=>{
+      if(v!==t.correct&&text.includes(v)){
+        hits.push(`「${v}」→ 正式表記：「${t.correct}」`);
+      }
+    });
+  });
+  const html=hits.length
+    ? '⚠ 表記ゆれ：'+hits.map(h=>`<span style="display:block;">${escHtml(h)}</span>`).join('')
+    : null;
+  setWarn('story-term-warn', html);
+  setWarn('story-term-warn-fs', html);
+}
+
+// ══ ストーリー：自動保存（30秒インターバル） ══
+function startStoryAutoSave(){
+  stopStoryAutoSave();
+  window._storyAutoSaveInterval=setInterval(()=>{
+    const body=document.getElementById('story-body')?.value||'';
+    const title=document.getElementById('story-title')?.value.trim()||'';
+    if((currentStoryId||title)&&body){
+      saveStoryDraft();
+      showAutoSaveToast();
+    }
+  },30000);
+}
+
+function stopStoryAutoSave(){
+  if(window._storyAutoSaveInterval)clearInterval(window._storyAutoSaveInterval);
+}
+
+function showAutoSaveToast(){
+  let toast=document.getElementById('_autosave-toast');
+  if(!toast){
+    toast=document.createElement('div');
+    toast.id='_autosave-toast';
+    toast.style.cssText='position:fixed;bottom:calc(60px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border);color:var(--parchment-dk);font-size:0.7rem;padding:0.3rem 0.8rem;border-radius:2px;z-index:300;opacity:0;transition:opacity 0.3s;letter-spacing:0.1em;pointer-events:none;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent='自動保存しました';
+  toast.style.opacity='1';
+  clearTimeout(toast._timer);
+  toast._timer=setTimeout(()=>toast.style.opacity='0',2000);
 }
 
 // ══ データ管理 ══
 function copyApiKey(){
   if(!apiKey){gmAlert('APIキーが登録されていません');return;}
-  navigator.clipboard.writeText(apiKey).then(()=>{
+  clipboardWrite(apiKey,()=>{
     const btn=document.querySelector('#options-page .btn-g');
     if(btn){const o=btn.textContent;btn.textContent='✓ コピー済';setTimeout(()=>btn.textContent=o,1500);}
   });
@@ -2545,12 +4085,23 @@ function onExportApiKeyToggle(){
   document.getElementById('apikey-export-warning').style.display=options.exportApiKey?'block':'none';
 }
 function exportData(){
-  const data={exportedAt:new Date().toISOString(),characters,roles};
+  const data={
+    exportedAt:new Date().toISOString(),
+    characters,
+    roles,
+    stories,
+    storyTerms:JSON.parse(localStorage.getItem(KEY_STORY_TERMS)||'[]'),
+    memo:localStorage.getItem(MEMO_KEY)||'',
+    mindmap:JSON.parse(localStorage.getItem(MM_KEY)||'null'),
+    sharedStories:JSON.parse(localStorage.getItem(KEY_SHARED_STORIES)||'[]'),
+    worldDB:worldDB||null,
+  };
   if(options.exportApiKey&&apiKey) data.apiKey=apiKey;
   localStorage.setItem(KEY_LAST_EXPORT, String(Date.now()));
   dismissBackupReminder();
-  downloadJSON(data,`grimoire_data_${Date.now()}.json`);
+  downloadJSON(data,`grimoire_backup_${Date.now()}.json`);
 }
+
 function importData(){
   const input=document.getElementById('import-file');
   input.onchange=e=>{
@@ -2559,13 +4110,56 @@ function importData(){
     reader.onload=ev=>{
       try{
         const data=JSON.parse(ev.target.result);
-        gmConfirm('データを読み込みます。既存データと統合しますか？',()=>{
-          if(data.characters){const ex=new Set(characters.map(c=>c.id)); data.characters.forEach(c=>{if(!ex.has(c.id))characters.push(c);});}
-          if(data.roles){const ex=new Set(roles.map(r=>r.id)); data.roles.forEach(r=>{if(!ex.has(r.id))roles.push(r);});}
-          const doFinish=()=>{
+        gmConfirm('データを読み込みます。既存データと統合（重複除外）して追加しますか？',()=>{
+          // characters
+          if(data.characters){
+            const ex=new Set(characters.map(c=>c.id));
+            data.characters.forEach(c=>{if(!ex.has(c.id))characters.push(c);});
             localStorage.setItem(KEY_CHARS,JSON.stringify(characters));
+          }
+          // roles
+          if(data.roles){
+            const ex=new Set(roles.map(r=>r.id));
+            data.roles.forEach(r=>{if(!ex.has(r.id))roles.push(r);});
             localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
+          }
+          // stories
+          if(data.stories){
+            const ex=new Set(stories.map(s=>s.id));
+            data.stories.forEach(s=>{if(!ex.has(s.id))stories.push(s);});
+            localStorage.setItem(KEY_STORIES,JSON.stringify(stories));
+          }
+          // storyTerms（配列：正式表記ベースで重複除外）
+          if(data.storyTerms&&Array.isArray(data.storyTerms)){
+            const cur=JSON.parse(localStorage.getItem(KEY_STORY_TERMS)||'[]');
+            const ex=new Set(cur.map(t=>t.correct));
+            data.storyTerms.forEach(t=>{if(!ex.has(t.correct))cur.push(t);});
+            localStorage.setItem(KEY_STORY_TERMS,JSON.stringify(cur));
+          }
+          // memo（既存が空なら復元）
+          if(data.memo&&!localStorage.getItem(MEMO_KEY)){
+            localStorage.setItem(MEMO_KEY,data.memo);
+          }
+          // mindmap（既存が空なら復元）
+          if(data.mindmap&&!localStorage.getItem(MM_KEY)){
+            localStorage.setItem(MM_KEY,JSON.stringify(data.mindmap));
+          }
+          // sharedStories
+          if(data.sharedStories&&Array.isArray(data.sharedStories)){
+            const cur=JSON.parse(localStorage.getItem(KEY_SHARED_STORIES)||'[]');
+            const ex=new Set(cur.map(s=>s.id));
+            data.sharedStories.forEach(s=>{if(!ex.has(s.id))cur.push(s);});
+            localStorage.setItem(KEY_SHARED_STORIES,JSON.stringify(cur));
+            loadSharedStories();
+          }
+          // worldDB（既存がなければ復元）
+          if(data.worldDB&&!worldDB){
+            worldDB=data.worldDB;
+            localStorage.setItem(KEY_DB,JSON.stringify(worldDB));
+          }
+          const doFinish=()=>{
             renderCharList();
+            renderStoryList();
             closeOptions();
             gmAlert('読み込みが完了しました');
           };
@@ -2582,12 +4176,19 @@ function importData(){
   };
   input.click();
 }
+
 function clearAllData(){
   gmConfirm('全データを消去しますか？\nこの操作は取り消せません。',()=>{
     gmConfirm('本当に消去しますか？',()=>{
-      characters=[]; roles=[];
-      localStorage.setItem(KEY_CHARS,JSON.stringify(characters)); localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
+      // 全localStorage項目を消去
+      [KEY_CHARS,KEY_ROLES,KEY_STORIES,KEY_STORY_TERMS,KEY_SHARED_STORIES,
+       KEY_LAST_EXPORT,MEMO_KEY,MM_KEY,KEY_DB,
+       KEY_ANN,KEY_ANN_READ,'gm_remind_dismissed',KEY_VERT_NOTIFIED].forEach(k=>localStorage.removeItem(k));
+      storyVertNotified={};
+      characters=[]; roles=[]; stories=[]; sharedStories=[]; storyTerms=[]; worldDB=null;
       renderCharList();
+      renderStoryList();
+      gmAlert('全データを消去しました。');
     });
   });
 }
@@ -2673,6 +4274,166 @@ function annMarkRead(){
 }
 
 // アーカイブページのアナウンスエリアを描画
+// ══ 共有写本 ══
+const KEY_SHARED_STORIES='gm_shared_stories';
+let sharedStories=[];
+let viewerIsVertical=false;
+let currentViewerStory=null;
+
+function loadSharedStories(){
+  sharedStories=JSON.parse(localStorage.getItem(KEY_SHARED_STORIES)||'[]');
+}
+
+function saveSharedStories(){
+  localStorage.setItem(KEY_SHARED_STORIES,JSON.stringify(sharedStories));
+}
+
+function loadSharedStory(event){
+  const file=event.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      // 最低限のバリデーション
+      if(!data.title&&!data.body){gmAlert('有効なストーリーJSONではありません');return;}
+      // 重複チェック（idが同じなら上書き確認）
+      const existing=sharedStories.findIndex(s=>s.id===data.id);
+      const doAdd=()=>{
+        data._sharedAt=Date.now();
+        if(existing>=0) sharedStories[existing]=data;
+        else sharedStories.unshift(data);
+        saveSharedStories();
+        renderSharedStoryList();
+        gmAlert(`「${data.title||'無題'}」を読み込みました。`);
+      };
+      if(existing>=0){
+        gmConfirm('同じIDの写本が既にあります。上書きしますか？',doAdd);
+      } else {
+        doAdd();
+      }
+    }catch{
+      gmAlert('JSONの読み込みに失敗しました。');
+    }
+    // inputをリセット（同じファイルを再選択できるよう）
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+function renderSharedStoryList(){
+  loadSharedStories();
+  const el=document.getElementById('shared-story-list'); if(!el)return;
+  if(!sharedStories.length){
+    el.innerHTML='<div class="archive-announce-empty">読み込まれた写本はありません</div>';
+    return;
+  }
+  el.innerHTML=sharedStories.map((s,i)=>{
+    const finished=!!s.finishedAt;
+    const mark=s.colophon?.mark||'';
+    const author=s.colophon?.author||'';
+    const date=s.colophon?.date
+      ? new Date(s.colophon.date).toLocaleDateString('ja-JP')
+      : new Date(s._sharedAt||s.updatedAt||s.createdAt||0).toLocaleDateString('ja-JP');
+    const chars=(s.body||'').length;
+    const sealHtml=mark?mark.replace('<svg ','<svg style="width:44px;height:44px;display:block;" '):'';
+    return `<div class="shared-story-card${finished?' finished-card':''}" onclick="openStoryViewer(${i})">
+      <div class="shared-story-card-info">
+        ${finished?`<div style="font-size:0.55rem;letter-spacing:0.25em;color:rgba(200,160,80,0.8);margin-bottom:0.2rem;">MANUSCRIPT</div>`:''}
+        <div class="shared-story-card-title">${escHtml(s.title||'無題')}</div>
+        <div class="shared-story-card-meta">${author?escHtml(author)+' ・ ':''}${date} ・ ${chars}字</div>
+      </div>
+      ${sealHtml?`<div class="shared-story-card-seal">${sealHtml}</div>`:''}
+      <button class="btn btn-d btn-sm" style="flex-shrink:0;" onclick="event.stopPropagation();removeSharedStory(${i})">削除</button>
+    </div>`;
+  }).join('');
+}
+
+function removeSharedStory(i){
+  gmConfirm('この写本を一覧から削除しますか？',()=>{
+    sharedStories.splice(i,1);
+    saveSharedStories();
+    renderSharedStoryList();
+  });
+}
+
+function openStoryViewer(i){
+  loadSharedStories();
+  const s=sharedStories[i]; if(!s)return;
+  currentViewerStory=s;
+  viewerIsVertical=s.isVertical||false;
+  // switchPageの管理外でarchiveページの上に重ねる形で表示
+  document.querySelectorAll('.page').forEach(p=>{if(p.id!=='page-archive')p.style.display='none';});
+  document.getElementById('page-archive').style.display='none';
+  document.getElementById('page-story-viewer').style.display='block';
+  document.getElementById('viewer-title-label').textContent=s.title||'無題';
+  _renderViewerMeta(s);
+  _renderViewerBody(s);
+  _applyViewerVertical();
+  _renderViewerColophon(s);
+}
+
+function closeStoryViewer(){
+  document.getElementById('page-story-viewer').style.display='none';
+  document.getElementById('page-archive').style.display='block';
+  // bnav-archiveのactive状態を確実に維持
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  const archiveBtn=document.getElementById('bnav-archive');
+  if(archiveBtn) archiveBtn.classList.add('active');
+  currentViewerStory=null;
+}
+
+function _renderViewerMeta(s){
+  const el=document.getElementById('viewer-meta'); if(!el)return;
+  const mark=s.colophon?.mark||'';
+  const sealHtml=mark?mark.replace('<svg ','<svg style="width:52px;height:52px;display:block;" '):'';
+  const author=s.colophon?.author||'';
+  const date=s.colophon?.date?new Date(s.colophon.date).toLocaleDateString('ja-JP'):'';
+  const chars=(s.body||'').length;
+  el.innerHTML=`
+    ${sealHtml?`<div>${sealHtml}</div>`:''}
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:0.9rem;color:var(--parchment);font-family:var(--font-serif);font-weight:600;margin-bottom:0.2rem;">${escHtml(s.title||'無題')}</div>
+      ${author?`<div style="font-size:0.75rem;color:var(--parchment-dk);">著者：${escHtml(author)}</div>`:''}
+      <div style="font-size:0.68rem;color:var(--ink-dim);margin-top:0.1rem;">${date?date+' ・ ':''}${chars}字</div>
+      ${s.finishedAt?`<div style="font-size:0.58rem;letter-spacing:0.2em;color:rgba(200,160,80,0.8);margin-top:0.3rem;">MANUSCRIPT ／ Nóstoi-Grimoire</div>`:''}
+    </div>`;
+}
+
+function _renderViewerBody(s){
+  const el=document.getElementById('viewer-body'); if(!el)return;
+  el.innerHTML=_parseBody(s.body||'');
+  _applyViewerVertical();
+}
+
+function _renderViewerColophon(s){
+  const el=document.getElementById('viewer-colophon'); if(!el)return;
+  if(!s.colophon){el.style.display='none';return;}
+  const mark=s.colophon.mark||'';
+  const sealHtml=mark?mark.replace('<svg ','<svg style="width:60px;height:60px;display:block;margin:0 auto;" '):'';
+  const author=s.colophon.author||'';
+  const date=s.colophon.date?new Date(s.colophon.date).toLocaleDateString('ja-JP'):'';
+  el.style.display='block';
+  el.innerHTML=`
+    <div style="font-size:0.7rem;letter-spacing:0.3em;color:var(--accent);margin-bottom:1rem;">― 奥　付 ―</div>
+    ${sealHtml?`<div style="margin-bottom:0.8rem;">${sealHtml}</div>`:''}
+    ${author?`<div style="font-size:0.85rem;color:var(--parchment);letter-spacing:0.15em;margin-bottom:0.3rem;">著者　${escHtml(author)}</div>`:''}
+    ${date?`<div style="font-size:0.75rem;color:var(--parchment-dk);letter-spacing:0.1em;margin-bottom:0.5rem;">${date}</div>`:''}
+    <div style="font-size:0.65rem;letter-spacing:0.2em;color:var(--accent);">${escHtml(s.colophon.seal||'ノストイ叙事詩環　Nóstoi-Grimoire')}</div>`;
+}
+
+function toggleViewerVertical(){
+  viewerIsVertical=!viewerIsVertical;
+  _applyViewerVertical();
+}
+
+function _applyViewerVertical(){
+  const el=document.getElementById('viewer-body');
+  const btn=document.getElementById('viewer-vert-btn');
+  if(!el)return;
+  el.classList.toggle('vertical',viewerIsVertical);
+  if(btn) btn.textContent=viewerIsVertical?'縦書き':'横書き';
+}
+
 function renderArchiveArea(offline=false){
   const area=document.getElementById('archive-announce-area');
   if(!area)return;
@@ -2743,7 +4504,7 @@ async function registerApiKey(){
   const btn=document.querySelector('#modal-api-setup .btn-p');
   const orig=btn.textContent; btn.textContent='確認中…'; btn.disabled=true;
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${key}`,{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{role:'user',parts:[{text:'hi'}]}]})
@@ -2773,7 +4534,7 @@ async function doAnalyze(mode){
   const prompt=buildAnalyzePrompt(mode); if(!prompt){gmAlert('本文を入力してください');return;}
   btn.disabled=true; result.innerHTML=`<div style="padding:1.2rem;color:var(--ink-dim);font-size:0.8rem;">解析中…</div>`;
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}]})});
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}]})});
     if(!res.ok){const e=await res.json().catch(()=>{});throw new Error(e?.error?.message||`HTTP ${res.status}`);}
     const data=await res.json(), text=data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'（応答なし）';
     result.innerHTML=`<div class="detail-analysis" style="margin-top:1rem;"><div class="detail-analysis-label">解析結果</div><div class="detail-analysis-text" id="ar-${mode}">${escHtml(text)}</div><div class="btn-row" style="margin-top:0.8rem;"><button class="btn btn-g btn-sm" onclick="copyText('ar-${mode}')">コピー</button></div></div>`;
@@ -2807,9 +4568,25 @@ function buildAnalyzePrompt(mode){
 
 // ══ ユーティリティ ══
 function downloadJSON(obj,name){const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);}
-function copyText(id){const el=document.getElementById(id);if(!el)return;navigator.clipboard.writeText(el.textContent).then(()=>{const b=el.parentElement?.querySelector('button');if(b){const o=b.textContent;b.textContent='✓ コピー済';setTimeout(()=>b.textContent=o,1500);}});}
+function copyText(id){const el=document.getElementById(id);if(!el)return;clipboardWrite(el.textContent,()=>{const b=el.parentElement?.querySelector('button');if(b){const o=b.textContent;b.textContent='✓ コピー済';setTimeout(()=>b.textContent=o,1500);}});}
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function escAttr(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+// クリップボードコピー（HTTPS・file://両対応）
+function clipboardWrite(text, onSuccess){
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(onSuccess).catch(()=>_clipboardFallback(text,onSuccess));
+  } else {
+    _clipboardFallback(text, onSuccess);
+  }
+}
+function _clipboardFallback(text, onSuccess){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.cssText='position:fixed;opacity:0;top:0;left:0;';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); onSuccess&&onSuccess(); }catch(e){}
+  document.body.removeChild(ta);
+}
 
 // ══════════════════════════════════════
 // カバンポップ
@@ -2911,7 +4688,7 @@ function switchMemoTab(tab){
   if(tab==='mind')setTimeout(()=>{initMindmap();renderMindmap();},50);
 }
 function clearFlatMemo(){gmConfirm('メモをクリアしますか？',()=>{document.getElementById('memo-flat-text').value='';localStorage.removeItem(MEMO_KEY);});}
-function copyFlatMemo(){navigator.clipboard.writeText(document.getElementById('memo-flat-text').value).then(()=>{const b=document.querySelector('#memo-flat-panel .btn-g:last-child');const o=b.textContent;b.textContent='✓ コピー済';setTimeout(()=>b.textContent=o,1500);});}
+function copyFlatMemo(){clipboardWrite(document.getElementById('memo-flat-text').value,()=>{const b=document.querySelector('#memo-flat-panel .btn-g:last-child');const o=b.textContent;b.textContent='✓ コピー済';setTimeout(()=>b.textContent=o,1500);});}
 
 // ── マインドマップ ──
 const MM_KEY='gm_mindmap';
@@ -3193,8 +4970,26 @@ function dismissBackupReminder(){
 // ══ 起動 ══
 (function init(){
   document.body.classList.add('title-active');
+  // タイトル画面フェードイン演出
+  requestAnimationFrame(()=>{
+    const ts=document.getElementById('title-screen');
+    if(!ts)return;
+    // 画面全体フェードイン
+    setTimeout(()=>ts.classList.add('fade-in'),30);
+    // 各要素を順番にreveal
+    const delays={'.title-nostoi':400,'.title-grimoire':900,'.title-sub-jp':1300,'#title-btn-container':1600};
+    Object.entries(delays).forEach(([sel,ms])=>{
+      setTimeout(()=>{
+        const el=ts.querySelector(sel);
+        if(el)el.classList.add('reveal');
+      },ms);
+    });
+  });
   characters=JSON.parse(localStorage.getItem(KEY_CHARS)||'[]');
   roles=JSON.parse(localStorage.getItem(KEY_ROLES)||'[]');
+  stories=JSON.parse(localStorage.getItem(KEY_STORIES)||'[]');
+  loadTerms();
+  loadSharedStories();
   worldDB=JSON.parse(localStorage.getItem(KEY_DB)||'null');
   apiKey=localStorage.getItem(KEY_API)||'';
   loadOptions();
@@ -3202,18 +4997,35 @@ function dismissBackupReminder(){
   if(worldDB)populateDBCatFilter();
   if(apiKey)unlockAnalyze();
   showView('char-list-view');
-  // Service Worker登録
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
-  }
-  // バックグラウンド時にBGM停止・復帰時に再開
+  // バックグラウンド・OSフォーカス奪取時にBGM停止、復帰時に再開
   document.addEventListener('visibilitychange',()=>{
-    if(!_bgmCtx)return;
+    if(!options.bgmEnabled)return; // ユーザーが手動停止中は何もしない
     if(document.hidden){
-      _bgmCtx.suspend().catch(()=>{});
+      if(_bgmCtx) _bgmCtx.suspend().catch(()=>{});
+      else{ const bgm=document.getElementById('bgm-main'); if(!bgm.paused) bgm.pause(); }
     } else {
-      _bgmCtx.resume().catch(()=>{});
+      if(_bgmCtx&&_bgmCtx.state==='suspended') _bgmCtx.resume().catch(()=>{});
+      else{ const bgm=document.getElementById('bgm-main'); if(bgm.paused&&bgm.src) bgm.play().catch(()=>{}); }
     }
+  });
+  // AudioContextがOSに奪われた（通話・他アプリの音声フォーカス取得）場合の検知
+  // stateがsuspendedになった際、documentが表示中であれば自アプリの意図的な停止でないと判断しない
+  // （visibilitychange側でsuspendしたケースとの区別はdocument.hiddenで行う）
+  // OSから自動resumeされた際も options.bgmEnabled が false なら再度suspendして封じる
+  function watchAudioContext(){
+    if(!_bgmCtx)return;
+    _bgmCtx.onstatechange=()=>{
+      if(_bgmCtx.state==='running'&&!options.bgmEnabled){
+        // ユーザーがOFFにしているのにOSが再開してしまった場合は即停止
+        _bgmCtx.suspend().catch(()=>{});
+      }
+    };
+  }
+  // preloadBGM完了後にも watchAudioContext を呼べるよう、_bgmCtxが生成される箇所を監視
+  const _origPreload=window.preloadBGM;
+  Object.defineProperty(window,'_bgmCtx',{
+    set(v){ Object.defineProperty(window,'_bgmCtx',{value:v,writable:true,configurable:true}); watchAudioContext(); },
+    configurable:true
   });
 })();
 </script>
