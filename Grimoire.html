@@ -1734,7 +1734,9 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 <input type="file" id="import-file" accept=".json" style="display:none;">
 <input type="file" id="db-file" accept=".json" style="display:none;">
 <audio id="se-page" src="" preload="metadata"></audio>
-<audio id="se-tab"  src="" preload="metadata"></audio>
+<audio id="se-tab"      src="" preload="metadata"></audio>
+<audio id="se-smalltab" src="" preload="metadata"></audio>
+<audio id="se-bookclosed" src="" preload="metadata"></audio>
 <audio id="bgm-main" src="" loop preload="metadata"></audio>
 
 <script>
@@ -2043,6 +2045,10 @@ function launchApp(){
     // SE読み込み
     const seTab=document.getElementById('se-tab');
     if(seTab) seTab.src='https://nostoi-creator.github.io/GM_Tabsound_SE.mp3';
+    const seSmall=document.getElementById('se-smalltab');
+    if(seSmall) seSmall.src='https://nostoi-creator.github.io/GM_Smalltab_SE.mp3';
+    const seBook=document.getElementById('se-bookclosed');
+    if(seBook) seBook.src='https://nostoi-creator.github.io/GM_bookclosed_SE.mp3';
     // BGM再生：0から3秒かけてフェードイン
     if(_bgmBuffer&&_bgmCtx){
       _bgmGain.gain.value=0;
@@ -2326,6 +2332,7 @@ function switchAnalyzeTab(tab){
   bagMenu.classList.toggle('chat-mode',isChat);
   // メニューが開いていたら閉じる（位置変更時のチラつき防止）
   if(bagOpen){ bagOpen=false; bagBtn.classList.remove('open'); bagMenu.classList.remove('open'); }
+  playSE('smalltab');
 }
 
 // ── 叙述チャット ──
@@ -2532,6 +2539,7 @@ function renderCharList(){
 
 function openCharDetail(id){
   currentCharId=id;
+  playSE('smalltab');
   const c=characters.find(c=>c.id===id);
   if(!c)return;
   const nameEl=document.getElementById('detail-char-name');
@@ -2565,7 +2573,7 @@ function openCharDetail(id){
   renderRoles();
 }
 
-function backToCharList(){currentCharId=null;showView('char-list-view');renderCharList();}
+function backToCharList(){currentCharId=null;showView('char-list-view');renderCharList();playSE('bookclosed');}
 function backToCharDetail(){showView('char-detail-view');}
 
 function showCharCreate(){
@@ -2573,6 +2581,7 @@ function showCharCreate(){
   document.getElementById('char-form-title').textContent='キャラクター作成';
   clearCharForm();
   showView('char-form-view');
+  playSE('smalltab');
 }
 
 function showCharEdit(){
@@ -2582,6 +2591,7 @@ function showCharEdit(){
   document.getElementById('char-form-title').textContent='キャラクター編集';
   fillCharForm(c);
   showView('char-form-view');
+  playSE('smalltab');
 }
 
 function showCharSheet(){
@@ -2589,6 +2599,7 @@ function showCharSheet(){
   if(!c)return;
   document.getElementById('sheet-preview-text').textContent=buildSheetText(c);
   showView('char-sheet-view');
+  playSE('smalltab');
 }
 
 function cancelCharForm(){
@@ -2941,6 +2952,7 @@ function openSession(sessionName){
   const label=sessionName||'（セッション名なし）';
   document.getElementById('session-role-title').textContent=label;
   renderSessionRoles();
+  playSE('smalltab');
 }
 
 function backToSessionList(){
@@ -2948,6 +2960,7 @@ function backToSessionList(){
   document.getElementById('session-role-view').style.display='none';
   document.getElementById('char-detail-view').style.display='block';
   renderSessionCards();
+  playSE('bookclosed');
 }
 
 function renderSessionRoles(){
@@ -3258,6 +3271,7 @@ function showStoryCreate(){
   loadTerms();
   startStoryAutoSave();
   showView('story-edit-view');
+  playSE('smalltab');
 }
 
 function openStory(id){
@@ -3277,6 +3291,7 @@ function openStory(id){
   loadTerms();
   startStoryAutoSave();
   showView('story-edit-view');
+  playSE('smalltab');
 }
 
 function backFromStory(){
@@ -3285,6 +3300,7 @@ function backFromStory(){
   clearTimeout(window._storyAutoSaveTimer);
   showView('char-list-view');
   renderStoryList();
+  playSE('bookclosed');
 }
 
 function saveStoryDraft(){
@@ -3520,6 +3536,7 @@ function goColophon(){
   refreshSealBuilder();
   updateColophonPreview();
   // イベントはHTML側のoninput/onchangeで処理（重複登録防止）
+  playSE('smalltab');
   showView('story-colophon-view');
   // スクロールをページ先頭に戻す
   const view=document.getElementById('story-colophon-view');
@@ -3529,6 +3546,7 @@ function goColophon(){
 
 function backFromColophon(){
   showView('story-edit-view');
+  playSE('smalltab');
 }
 
 function buildColophonMarkGrid(){
