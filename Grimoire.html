@@ -2574,7 +2574,7 @@ function openCharDetail(id){
 }
 
 function backToCharList(){currentCharId=null;showView('char-list-view');renderCharList();playSE('bookclosed');}
-function backToCharDetail(){showView('char-detail-view');}
+function backToCharDetail(){showView('char-detail-view');playSE('smalltab');}
 
 function showCharCreate(){
   editingCharId=null;
@@ -2603,8 +2603,8 @@ function showCharSheet(){
 }
 
 function cancelCharForm(){
-  if(editingCharId){openCharDetail(editingCharId);}
-  else{showView('char-list-view');renderCharList();}
+  if(editingCharId){openCharDetail(editingCharId);playSE('smalltab');}
+  else{showView('char-list-view');renderCharList();playSE('bookclosed');}
 }
 
 function clearCharForm(){
@@ -2862,6 +2862,7 @@ function confirmDeleteChar(){
   showView('char-list-view');
   renderCharList();
   if(withExport) exportData();
+  playSE('bookclosed');
 }
 
 // ══ シートテキスト生成 ══
@@ -3583,6 +3584,7 @@ function finishStory(){
     gmAlert('写本が完成しました。');
     showView('char-list-view');
     renderStoryList();
+    playSE('bookclosed');
   };
   if(!author){
     gmConfirm('著者名が空欄です。本当によろしいですか？',doFinish);
