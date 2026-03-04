@@ -156,6 +156,11 @@ body.title-active{overflow:hidden;}
   -webkit-text-stroke:0.6px rgba(255,255,255,0.85);
   text-shadow:0 0 6px rgba(255,255,255,0.15),0 1px 4px rgba(0,0,0,0.9);
 }
+#title-version{
+  font-family:var(--font-serif);font-size:0.58rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:var(--parchment-dim);opacity:0;text-align:center;margin-top:1.4rem;
+}
+#title-version.reveal{animation:titleFadeIn 0.8s ease forwards;}
 #title-start{cursor:pointer;user-select:none;}
 .blink-text{font-family:var(--font-display);font-size:clamp(0.75rem,2vw,0.95rem);letter-spacing:0.5em;color:#C1AB8F;text-transform:uppercase;animation:blink 3s ease-in-out infinite;display:inline-block;padding:0.5rem 1.5rem;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
@@ -197,7 +202,7 @@ body.title-active{overflow:hidden;}
 /* ── ヘッダー ── */
 .app-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 1rem;height:52px;display:flex;align-items:center;gap:0.8rem;position:sticky;top:0;z-index:50;}
 .app-title{font-family:var(--font-display);font-size:1rem;font-weight:300;letter-spacing:0.3em;color:var(--parchment);text-transform:uppercase;}
-.app-title span{font-size:0.65rem;color:var(--parchment-dk);letter-spacing:0.15em;margin-left:0.5rem;}
+.app-title span{font-size:0.65rem;color:var(--parchment-dim);letter-spacing:0.15em;margin-left:0.5rem;}
 .header-actions{margin-left:auto;display:flex;gap:0.5rem;align-items:center;}
 .header-icon-btn{background:none;border:1px solid var(--border);color:var(--ink-dim);font-size:1rem;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:1px;transition:all 0.15s;}
 .header-icon-btn:hover{border-color:var(--border-hi);color:var(--ink);}
@@ -229,12 +234,11 @@ body.title-active{overflow:hidden;}
 .bnav-item:hover{color:var(--ink);background:rgba(184,115,51,0.04);}
 .bnav-item.active{color:var(--accent);border-top-color:var(--accent);}
 .bnav-item.disabled{color:var(--parchment-dk) !important;opacity:0.45;cursor:not-allowed;pointer-events:none;}
-.bnav-icon{font-size:1.1rem;}
+.bnav-icon{display:flex;align-items:center;justify-content:center;width:22px;height:22px;}
+.bnav-icon svg{opacity:0.5;transition:opacity 0.15s;}
+.bnav-item.active .bnav-icon svg{opacity:1;}
+.bnav-item:hover .bnav-icon svg{opacity:0.75;}
 .bnav-label{font-size:0.58rem;letter-spacing:0.08em;}
-.bnav-icon-archive{filter:saturate(0) brightness(0.65);}
-#bnav-archive.active .bnav-icon-archive{filter:saturate(0.5) brightness(0.9);}
-.bnav-icon-analyze{filter:saturate(0) brightness(0.65);}
-#bnav-analyze.active .bnav-icon-analyze{filter:saturate(0.5) brightness(0.9);}
 
 /* ── ページ ── */
 .page{display:none;padding:1.2rem 1rem;max-width:760px;margin:0 auto;}
@@ -316,6 +320,9 @@ select option{background:var(--bg2);}
 .story-card.finished:hover{border-color:var(--accent);}
 .story-card.finished .story-card-title{color:var(--accent);}
 /* 上下の装飾罫線 */
+.story-card-actions{margin-top:0.6rem;display:flex;justify-content:flex-end;}
+.story-card-del{opacity:0;transition:opacity 0.15s;}
+.story-card:hover .story-card-del{opacity:1;}
 .story-card.finished::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--accent) 20%,rgba(200,160,80,0.9) 50%,var(--accent) 80%,transparent 100%);}
 .story-card.finished::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(184,115,51,0.4) 30%,rgba(184,115,51,0.4) 70%,transparent 100%);}
 .story-finished-label{font-size:0.58rem;letter-spacing:0.25em;color:rgba(200,160,80,0.85);text-transform:uppercase;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem;}
@@ -471,10 +478,13 @@ input[type="range"]{width:100%;height:3px;-webkit-appearance:none;background:lin
 input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--parchment);border-radius:50%;border:1px solid var(--accent);}
 
 /* ── カバンポップ ── */
-#bag-btn{position:fixed;right:1rem;bottom:calc(72px + env(safe-area-inset-bottom));z-index:60;width:46px;height:46px;background:var(--bg2);border:1px solid var(--border-hi);border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:1.2rem;box-shadow:0 2px 12px rgba(0,0,0,0.5);transition:right 0.25s ease, left 0.25s ease, bottom 0.25s ease, top 0.25s ease;}
+#bag-btn{position:fixed;right:1rem;bottom:calc(72px + env(safe-area-inset-bottom));z-index:60;width:46px;height:46px;background:var(--bg2);border:1px solid var(--border-hi);border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.5);transition:right 0.25s ease, left 0.25s ease, bottom 0.25s ease, top 0.25s ease;}
 #bag-btn.visible{display:flex;}
 #bag-btn:hover{border-color:var(--accent);box-shadow:0 2px 16px var(--accent-glow);}
 #bag-btn.open{background:var(--accent);border-color:var(--accent);}
+#bag-btn svg{stroke:var(--parchment-dim);transition:stroke 0.15s;opacity:0.85;}
+#bag-btn.open svg{stroke:var(--parchment);opacity:1;}
+#bag-btn:hover svg{stroke:var(--parchment);opacity:1;}
 #bag-btn.chat-mode{bottom:auto;top:calc(52px + env(safe-area-inset-top) + 0.4rem);right:0.8rem;}
 #bag-menu{position:fixed;right:1rem;bottom:calc(126px + env(safe-area-inset-bottom));z-index:60;display:flex;flex-direction:column;gap:0.4rem;align-items:flex-end;pointer-events:none;opacity:0;transform:translateY(8px);transition:all 0.2s;}
 #bag-menu.open{pointer-events:all;opacity:1;transform:translateY(0);}
@@ -482,6 +492,8 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 #bag-menu.chat-mode.open{transform:translateY(0);}
 .bag-menu-item{background:var(--bg2);border:1px solid var(--border-hi);border-radius:2px;padding:0.4rem 0.8rem;font-size:0.75rem;letter-spacing:0.1em;color:var(--parchment);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:0.5rem;transition:all 0.15s;}
 .bag-menu-item:hover{border-color:var(--accent);color:var(--accent);}
+.bag-menu-item svg{stroke:currentColor;opacity:0.8;flex-shrink:0;}
+.dice-icon svg{stroke:var(--accent);opacity:0.9;}
 /* カバンモーダル */
 .bag-modal{background:var(--bg2);border:1px solid var(--border-hi);border-radius:2px;width:100%;max-width:420px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;animation:fadeIn 0.2s ease;}
 .bag-modal-header{display:flex;align-items:center;padding:0.8rem 1rem;border-bottom:1px solid var(--border);flex-shrink:0;}
@@ -637,6 +649,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
     <div class="title-nostoi">Nóstoi</div>
     <div class="title-grimoire">Grimoire</div>
     <div class="title-sub-jp">ノストイ叙事詩環</div>
+    <div id="title-version">β 1.0.0</div>
   </div>
   <div id="title-btn-container">
     <div id="title-start" onclick="playSETitle();onStartClick()"><span class="blink-text">START</span></div>
@@ -652,6 +665,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 <div id="app">
   <div class="app-header">
     <span class="app-title">Grimoire <span>Nóstoi</span></span>
+    <span id="app-version" style="font-family:var(--font-serif);font-size:0.55rem;letter-spacing:0.2em;color:var(--parchment-dim);opacity:0.85;margin-left:0.8rem;white-space:nowrap;">β 1.0.0</span>
     <div class="header-actions">
       <button class="header-icon-btn" onclick="openHelp()">?</button>
       <button class="header-icon-btn" onclick="openOptions()">⚙</button>
@@ -1077,10 +1091,9 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
       <input type="text" id="db-search" placeholder="記事を検索…" oninput="renderDB()">
       <select id="db-cat-filter" onchange="renderDB()" style="width:auto;"><option value="">すべて</option></select>
     </div>
-    <div id="db-not-loaded" style="display:none;">
+    <div id="db-not-loaded">
       <div class="empty">
-        <div class="empty-icon">📚</div>
-        <div class="empty-text">アーカイブが読み込まれていません</div>
+        <div class="empty-text">紙片が欠けている⋯⋯</div>
         <button class="btn btn-p btn-sm" style="margin-top:1rem;" onclick="openOptions();setTimeout(()=>{const el=document.getElementById('opt-db-section');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},320);">オプションで読み込む</button>
       </div>
     </div>
@@ -1164,13 +1177,27 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 
   <nav class="bottom-nav">
     <button class="bnav-item" id="bnav-archive" onclick="switchPage('archive')">
-      <span class="bnav-icon bnav-icon-archive">📚</span><span class="bnav-label">アーカイブ</span>
+      <span class="bnav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M4 4 C4 4 7 3 12 5 C17 3 20 4 20 4 L20 20 C20 20 17 19 12 21 C7 19 4 20 4 20 Z"/>
+  <line x1="12" y1="5" x2="12" y2="21"/>
+  <line x1="7" y1="6.5" x2="11" y2="7.8"/>
+  <line x1="7" y1="10" x2="11" y2="11"/>
+  <line x1="7" y1="13.5" x2="11" y2="14.5"/>
+</svg></span><span class="bnav-label">アーカイブ</span>
     </button>
     <button class="bnav-item active" id="bnav-roleplay" onclick="switchPage('roleplay')">
-      <span class="bnav-icon">⚔</span><span class="bnav-label">ロールプレイ</span>
+      <span class="bnav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><!-- 本体 --><rect x="5" y="5" width="14" height="14" rx="1"/><!-- 上の巻き --><path d="M5 5 C5 2.5 8 2.5 8 5"/><path d="M19 5 C19 2.5 16 2.5 16 5"/><!-- 下の巻き --><path d="M5 19 C5 21.5 8 21.5 8 19"/><path d="M19 19 C19 21.5 16 21.5 16 19"/><!-- 本文線 --><line x1="8" y1="9" x2="16" y2="9" stroke-width="1"/><line x1="8" y1="12" x2="16" y2="12" stroke-width="1"/><line x1="8" y1="15" x2="13" y2="15" stroke-width="1"/></svg></span><span class="bnav-label">ロールプレイ</span>
     </button>
     <button class="bnav-item" id="bnav-analyze" onclick="switchPage('analyze')">
-      <span class="bnav-icon bnav-icon-analyze">👁</span><span class="bnav-label">グリモワール</span>
+      <span class="bnav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M2 12 C5 6 9 4 12 4 C15 4 19 6 22 12 C19 18 15 20 12 20 C9 20 5 18 2 12 Z"/>
+  <circle cx="12" cy="12" r="3"/>
+  <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+  <line x1="12" y1="4" x2="12" y2="2"/>
+  <line x1="12" y1="20" x2="12" y2="22"/>
+  <line x1="5.5" y1="7" x2="4" y2="5.5"/>
+  <line x1="18.5" y1="7" x2="20" y2="5.5"/>
+</svg></span><span class="bnav-label">グリモワール</span>
     </button>
   </nav>
 </div>
@@ -1192,8 +1219,8 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
           <span class="help-item-arrow">▶</span>
         </div>
         <div class="help-item-body">
-          <p><span class="help-tag">ONLINE</span> を選ぶとフォントの読み込み・火の粉アニメーション・BGM・SEが有効になります。インターネット接続が必要です。</p>
-          <p><span class="help-tag">OFFLINE</span> を選ぶとこれらの演出なしで起動します。接続なしでも全機能が使えます。</p>
+          <p><span class="help-tag">ONLINE</span> を選ぶとフォントの読み込み・火の粉アニメーション・BGM・SE・グリモワール機能（AI補助）が有効になります。インターネット接続が必要です。</p>
+          <p><span class="help-tag">OFFLINE</span> を選ぶとこれらの演出とAI機能なしで起動します。接続なしでもキャラクター管理・ロール記録・ストーリー執筆・アーカイブ閲覧は全て使えます。</p>
         </div>
       </div>
     </div>
@@ -1208,8 +1235,8 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
         </div>
         <div class="help-item-body">
           <p>ロールプレイタブ下部の <span class="help-tag">＋ キャラクターを作成</span> をタップします。</p>
-          <p>識別タグ（例：#アントス）と名前は必須項目です。性別・種族・ジョブはプルダウンから選択すると、コピー用のシート文字（ᴍᴀʟᴇ等）に自動変換されます。</p>
-          <p>武装・防具・アイテム・魔法は <span class="help-tag">＋</span> ボタンで項目を追加できます。保存後はいつでも編集できます。</p>
+          <p>識別タグ（例：#アントス）と名前は必須項目です。性別・種族・ジョブはプルダウンから選択すると、コピー用のシート文字（ᴍᴀʟᴇ等）に自動変換されます。ジョブは主職と副職を並列で選択できます。</p>
+          <p>武装・防具・乗り物・アイテム・魔法は <span class="help-tag">＋</span> ボタンで項目を追加できます。保存後はいつでも編集できます。</p>
         </div>
       </div>
 
@@ -1219,7 +1246,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
           <span class="help-item-arrow">▶</span>
         </div>
         <div class="help-item-body">
-          <p>キャラクター詳細画面の <span class="help-tag">シート</span> ボタンをタップするとLINE用の整形テキストが表示されます。</p>
+          <p>キャラクター詳細画面の <span class="help-tag">シート</span> ボタンをタップするとLINE投稿用の整形テキストが表示されます。</p>
           <p><span class="help-tag">シートをコピー</span> ボタンでクリップボードに一括コピーできます。そのままLINEに貼り付けてください。</p>
         </div>
       </div>
@@ -1232,7 +1259,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
         <div class="help-item-body">
           <p>キャラクターを選択した状態で <span class="help-tag">＋ ロールを記録</span> をタップします。</p>
           <p>種別（相手 / 自分）・セッション名・ロール本文を入力して保存してください。タグはカンマ区切りで複数入力できます。</p>
-          <p>セッション名は過去に入力したものが補完候補として表示されます。</p>
+          <p>セッション名は過去に入力したものが補完候補として表示されます。同じセッション名でまとめたロールはセッションカードとして一覧表示されます。</p>
         </div>
       </div>
 
@@ -1242,9 +1269,21 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
           <span class="help-item-arrow">▶</span>
         </div>
         <div class="help-item-body">
-          <p>ロール一覧はキャラクターごとに表示されます。キーワード検索・種別フィルター（相手 / 自分）で絞り込めます。</p>
-          <p>セッション名バッジをタップすると、そのセッションのロールだけに絞り込めます。</p>
-          <p>ロールカードをタップすると本文・メモ・分析結果が展開されます。もう一度タップで閉じます。</p>
+          <p>ロール一覧はキャラクターごとにセッション単位で表示されます。キーワード検索・種別フィルター（相手 / 自分）で絞り込めます。</p>
+          <p>セッションカードをタップするとそのセッションのロール一覧が開きます。ロールカードをタップすると本文・メモが展開されます。</p>
+          <p>ロールカード右上の矢印ボタンで並び順を変更できます。</p>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-item-header" onclick="toggleHelp(this)">
+          <span class="help-item-title">キャラクターのロスト（死亡）を記録する</span>
+          <span class="help-item-arrow">▶</span>
+        </div>
+        <div class="help-item-body">
+          <p>キャラクター詳細画面の <span class="help-tag">ロスト</span> ボタンから死亡を記録できます。</p>
+          <p>ロスト済みキャラクターは名前に <span class="help-tag">死亡</span> バッジが表示されます。データとロール記録はそのまま残ります。</p>
+          <p>同じボタンから蘇生（ロスト解除）も行えます。</p>
         </div>
       </div>
 
@@ -1254,8 +1293,58 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
           <span class="help-item-arrow">▶</span>
         </div>
         <div class="help-item-body">
-          <p>キャラクター詳細画面の <span class="help-tag">編集</span> ボタンから内容を修正できます。</p>
+          <p>キャラクター詳細画面の <span class="help-tag">編集</span> ボタンから内容を修正できます。ロスト状態は編集しても保持されます。</p>
           <p><span class="help-tag">削除</span> ボタンを押すとキャラクターと関連する全ロールが削除されます。この操作は取り消せません。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-title">写本（ストーリー）</div>
+
+      <div class="help-item">
+        <div class="help-item-header" onclick="toggleHelp(this)">
+          <span class="help-item-title">ストーリーを書く</span>
+          <span class="help-item-arrow">▶</span>
+        </div>
+        <div class="help-item-body">
+          <p>ロールプレイタブの <span class="help-tag">＋ 写本を記す</span> をタップして執筆画面を開きます。タイトルと本文を入力してください。</p>
+          <p>関連するキャラクターやセッションをチップから紐付けることができます。本文は自動保存されます。</p>
+          <p><span class="help-tag">全画面</span> ボタンで没入執筆モードに切り替えられます。</p>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-item-header" onclick="toggleHelp(this)">
+          <span class="help-item-title">縦書きプレビュー</span>
+          <span class="help-item-arrow">▶</span>
+        </div>
+        <div class="help-item-body">
+          <p>執筆画面の <span class="help-tag">縦書き</span> ボタンをタップすると縦書きレイアウトのプレビューが表示されます。</p>
+          <p>プレビューは本文の編集と連動してリアルタイムで更新されます。全画面モードでも利用できます。</p>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-item-header" onclick="toggleHelp(this)">
+          <span class="help-item-title">奥付と刊記紋を設定する</span>
+          <span class="help-item-arrow">▶</span>
+        </div>
+        <div class="help-item-body">
+          <p>執筆画面の <span class="help-tag">奥付に移る →</span> ボタンから奥付設定画面に進みます。タイトル入力が必須です。</p>
+          <p>著者名・日付の有無を設定し、刊記紋（外枠・中心紋・装飾）を組み合わせて作成できます。各パーツは個別に色を変更できます（プリセット10色＋カスタムカラー）。</p>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-item-header" onclick="toggleHelp(this)">
+          <span class="help-item-title">PDF出力・JSONで中途保存する</span>
+          <span class="help-item-arrow">▶</span>
+        </div>
+        <div class="help-item-body">
+          <p>執筆画面の <span class="help-tag">PDF</span> ボタンでブラウザの印刷ダイアログが開きます。「PDFに保存」を選択すると縦書きレイアウトのPDFとして書き出せます。</p>
+          <p><span class="help-tag">中途保存</span> ボタンで現在の状態をJSONファイルとしてダウンロードできます。本文が空の場合は保存できません。</p>
+          <p>奥付設定後に <span class="help-tag">完成</span> を押すと完成データがJSONでダウンロードされます。</p>
         </div>
       </div>
     </div>
@@ -1284,19 +1373,30 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
           <p>カテゴリフィルターで特定カテゴリの記事だけを表示できます。記事カードをタップすると本文が展開されます。</p>
         </div>
       </div>
-    </div>
-
-    <div class="help-section">
-      <div class="help-section-title">分析</div>
 
       <div class="help-item">
         <div class="help-item-header" onclick="toggleHelp(this)">
-          <span class="help-item-title">グリモワール機能（AI補助）を解放する</span>
+          <span class="help-item-title">共有写本を閲覧する</span>
           <span class="help-item-arrow">▶</span>
         </div>
         <div class="help-item-body">
-          <p>グリモワール機能（AI補助）にはGoogle Gemini APIキーが必要です。<span class="help-tag">APIキーを登録して解放する</span> から登録画面を開いてください。</p>
-          <p>APIキーはaistudio.google.comで無料取得できます。ただし使用量に応じた費用（無料枠超過時）が発生する場合があります。費用の管理はご自身で行ってください。</p>
+          <p>アーカイブタブの下部に共有写本一覧が表示されます。管理人が共有した完成ストーリーをここで読めます。</p>
+          <p>共有写本の追加は管理人のみが行えます。オンライン時にのみ更新データが取得されます。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-title">グリモワール（AI補助）</div>
+
+      <div class="help-item">
+        <div class="help-item-header" onclick="toggleHelp(this)">
+          <span class="help-item-title">グリモワール機能を解放する</span>
+          <span class="help-item-arrow">▶</span>
+        </div>
+        <div class="help-item-body">
+          <p>グリモワール機能にはGoogle Gemini APIキーが必要です。<span class="help-tag">APIキーを登録して解放する</span> から登録画面を開いてください。</p>
+          <p>APIキーはaistudio.google.comで無料取得できます。無料枠超過時は費用が発生する場合があります。費用の管理はご自身で行ってください。</p>
           <p>キーはこの端末のブラウザにのみ保存されます。他の端末で使う場合は再登録が必要です。</p>
         </div>
       </div>
@@ -1310,7 +1410,35 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
           <p><span class="help-tag">相手</span> 相手のロール本文を貼り付けて解析します。分析カテゴリを選択すると観点を指定できます。</p>
           <p><span class="help-tag">自分</span> 自分のロール本文を貼り付けて強みと課題を評価します。</p>
           <p><span class="help-tag">作成補助</span> 現在の状況・文脈を入力するとロールの草案や構造提案を生成します。補助モードで用途を絞れます。</p>
-          <p>世界観資料が読み込まれている場合、ロール本文の内容に関連する記事を自動で参照して分析精度を高めます。</p>
+          <p>世界観資料が読み込まれている場合、ロール本文の内容に関連する記事を自動参照して分析精度を高めます。</p>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-item-header" onclick="toggleHelp(this)">
+          <span class="help-item-title">叙述チャットを使う</span>
+          <span class="help-item-arrow">▶</span>
+        </div>
+        <div class="help-item-body">
+          <p><span class="help-tag">叙述</span> タブではAIと自由形式で会話できます。ロール文の相談・世界観に関する質問・文章の壁打ちなどに使えます。</p>
+          <p>会話履歴はタブを切り替えても保持されます。<span class="help-tag">クリア</span> ボタンで履歴をリセットできます。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-title">バッグツール</div>
+
+      <div class="help-item">
+        <div class="help-item-header" onclick="toggleHelp(this)">
+          <span class="help-item-title">バッグツールを使う</span>
+          <span class="help-item-arrow">▶</span>
+        </div>
+        <div class="help-item-body">
+          <p>画面右下の <span class="help-tag">🎒</span> ボタンをタップするとツールメニューが開きます。</p>
+          <p><span class="help-tag">🎲 ダイス</span> D4〜D20の6種類のダイスを振れます。結果は履歴として表示されます。</p>
+          <p><span class="help-tag">📝 メモ帳</span> セッション中のメモを書き残せます。マインドマップ機能も内包しています。内容は端末に自動保存されます。</p>
+          <p><span class="help-tag">🔢 電卓</span> 通常の四則演算が使えます。</p>
         </div>
       </div>
     </div>
@@ -1324,8 +1452,8 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
           <span class="help-item-arrow">▶</span>
         </div>
         <div class="help-item-body">
-          <p>オプション画面の <span class="help-tag">データ管理</span> セクションからキャラクターとロールのデータをJSONファイルとして書き出せます。</p>
-          <p>機種変更やブラウザのデータ消去に備えて定期的なバックアップを推奨します。</p>
+          <p>オプション画面の <span class="help-tag">データ管理</span> セクションから全データをJSONファイルとして書き出せます。</p>
+          <p>バックアップの対象はキャラクター・ロール・ストーリー（写本）・用語・メモ・マインドマップ・世界観資料です。機種変更やブラウザのデータ消去に備えて定期的なバックアップを推奨します。</p>
           <p>インポート時は既存データとの統合になります。重複するIDのデータは上書きされません。</p>
         </div>
       </div>
@@ -1448,11 +1576,36 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
       <div id="db-current-info" style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:1rem;"></div>
       <button class="btn btn-p" onclick="loadDB()">📂 世界観資料を読み込む</button>
     </div>
+    <div class="options-section">
+      <div class="options-section-title">クレジット</div>
+      <button class="btn btn-g" onclick="openModal('modal-credits')">© クレジット表記</button>
+    </div>
   </div>
 </div>
 
 <!-- ══ モーダル ══ -->
-<!-- 汎用ダイアログ（alert/confirm代替） -->
+<!-- クレジット -->
+<div class="modal-overlay" id="modal-credits" onclick="if(event.target===this)closeModal('modal-credits')">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-title">Credits</div>
+    <div style="font-size:0.78rem;line-height:2;color:var(--ink);">
+      <p style="font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--accent);margin-bottom:0.6rem;">BGM</p>
+      <p style="margin-bottom:0.2rem;font-weight:600;">"Celtic Soul"</p>
+      <p style="color:var(--ink-dim);">Artist: Solas Composer</p>
+      <p style="color:var(--ink-dim);">Powered by Breaking Copyright</p>
+      <p style="color:var(--ink-dim);">License: Creative Commons BY-SA 3.0</p>
+    </div>
+    <div style="height:1px;background:var(--border);margin:1rem 0;"></div>
+    <div style="font-size:0.78rem;line-height:2;color:var(--ink);">
+      <p style="font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--accent);margin-bottom:0.6rem;">SE</p>
+      <p style="color:var(--ink-dim);">OtoLogic</p>
+      <p style="color:var(--ink-dim);">License: OtoLogic利用規約に準拠</p>
+    </div>
+    <div class="btn-row" style="margin-top:1.4rem;justify-content:flex-end;">
+      <button class="btn btn-g" onclick="closeModal('modal-credits')">閉じる</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="modal-gm-dialog">
   <div class="modal" style="max-width:360px;">
     <div class="modal-title" id="gm-dialog-title"></div>
@@ -1615,11 +1768,11 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 </div>
 
 <!-- ══ カバンポップ ══ -->
-<button id="bag-btn" onclick="toggleBag()">✒️</button>
+<button id="bag-btn" onclick="toggleBag()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><!-- 羽根輪郭：右上先端から左縁→ペン先、右縁スカラップ --><path d="M18 3 C20 3 21 5 20 7 C21 8 21 10 19.5 11 C20 12 19 13.5 18 14 C18 15.5 17 16.5 16 17 C14 19 12 20 9 20.5 L5.5 21" stroke-linejoin="round"/><!-- 右縁スカラップ --><path d="M18 3 C17 4 16 5 15.5 7 C16.5 7.5 17.5 8.5 17 10 C17.5 10.5 18 11.5 17.5 13 C17 14 16.5 15 16 17"/><!-- 羽軸 --><line x1="18" y1="3" x2="6" y2="20"/><!-- ペン先 --><path d="M6 20 L4.5 22.5" stroke-width="1.1"/><path d="M6 20 L5 22" stroke-width="0.7" opacity="0.6"/></svg></button>
 <div id="bag-menu">
-  <div class="bag-menu-item" onclick="openBagTool('dice')">🎲 ダイス</div>
-  <div class="bag-menu-item" onclick="openBagTool('memo')">📝 メモ帳</div>
-  <div class="bag-menu-item" onclick="openBagTool('calc')">🔢 電卓</div>
+  <div class="bag-menu-item" onclick="openBagTool('memo')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4 C6 2.5 7.5 2 8.5 2 L18 2 C19 2 20 2.8 20 4 L20 20 C20 21.2 19 22 18 22 L6.5 22 C5.5 22 4 21.5 4 20 C4 18.5 5.5 18 6.5 18 L20 18"/><path d="M6 4 C5 4 4 4.8 4 6 L4 20"/><line x1="9" y1="7" x2="17" y2="7"/><line x1="9" y1="10.5" x2="17" y2="10.5"/><line x1="9" y1="14" x2="14" y2="14"/></svg> 筆を執る</div>
+  <div class="bag-menu-item" onclick="openBagTool('calc')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5 C12 5 10 3 7.5 3.5 C5 4 3.5 6 3.5 8 C3.5 9.5 4 10.5 4 10.5 C2.5 11.5 2 13 2.5 14.5 C3 16 4.5 17 6 17 C6 18.5 7 20 8.5 20.5 C10 21 11.5 20.5 12 19.5"/><path d="M12 5 C12 5 14 3 16.5 3.5 C19 4 20.5 6 20.5 8 C20.5 9.5 20 10.5 20 10.5 C21.5 11.5 22 13 21.5 14.5 C21 16 19.5 17 18 17 C18 18.5 17 20 15.5 20.5 C14 21 12.5 20.5 12 19.5"/><line x1="12" y1="5" x2="12" y2="19.5"/><path d="M12 9 C10.5 9 9 10 9 11.5" stroke-width="1" opacity="0.6"/><path d="M12 13 C13.5 13 15 12 15 10.5" stroke-width="1" opacity="0.6"/></svg> 演算をする</div>
+  <div class="bag-menu-item" onclick="openBagTool('dice')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg> 賽を投げる</div>
 </div>
 
 <!-- 電卓モーダル -->
@@ -1712,12 +1865,12 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
     </div>
     <div class="bag-modal-body">
       <div class="dice-grid">
-        <div class="dice-btn" onclick="rollDice(4)"><div class="dice-label">D4</div><div class="dice-icon">🔺</div></div>
-        <div class="dice-btn" onclick="rollDice(6)"><div class="dice-label">D6</div><div class="dice-icon">🎲</div></div>
-        <div class="dice-btn" onclick="rollDice(8)"><div class="dice-label">D8</div><div class="dice-icon">💠</div></div>
-        <div class="dice-btn" onclick="rollDice(10)"><div class="dice-label">D10</div><div class="dice-icon">🔷</div></div>
-        <div class="dice-btn" onclick="rollDice(12)"><div class="dice-label">D12</div><div class="dice-icon">🔶</div></div>
-        <div class="dice-btn" onclick="rollDice(20)"><div class="dice-label">D20</div><div class="dice-icon">⭐</div></div>
+        <div class="dice-btn" onclick="rollDice(4)"><div class="dice-label">D4</div><div class="dice-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,3 22,20 2,20"/><line x1="12" y1="10" x2="12" y2="17" stroke-width="1" opacity="0.5"/></svg></div></div>
+        <div class="dice-btn" onclick="rollDice(6)"><div class="dice-label">D6</div><div class="dice-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="dice-btn" onclick="rollDice(8)"><div class="dice-label">D8</div><div class="dice-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 22,12 12,22 2,12"/><line x1="2" y1="12" x2="22" y2="12" stroke-width="0.8" opacity="0.4"/></svg></div></div>
+        <div class="dice-btn" onclick="rollDice(10)"><div class="dice-label">D10</div><div class="dice-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 20,8 17,18 7,18 4,8"/><line x1="7" y1="18" x2="12" y2="22"/><line x1="17" y1="18" x2="12" y2="22"/></svg></div></div>
+        <div class="dice-btn" onclick="rollDice(12)"><div class="dice-label">D12</div><div class="dice-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 19,6 22,13 19,20 12,22 5,20 2,13 5,6"/></svg></div></div>
+        <div class="dice-btn" onclick="rollDice(20)"><div class="dice-label">D20</div><div class="dice-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 21,8 21,16 12,22 3,16 3,8"/><polygon points="12,7 17,11 15,17 9,17 7,11" stroke-width="0.8" opacity="0.5"/></svg></div></div>
       </div>
       <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:1rem;">
         <input type="number" id="dice-custom-faces" min="2" max="999" placeholder="面数" style="width:80px;">
@@ -3243,6 +3396,7 @@ function renderStoryList(){
     const author=s.colophon?.author?`著者：${escHtml(s.colophon.author)}`:'';
     const date=new Date(s.updatedAt||s.createdAt).toLocaleDateString('ja-JP');
     const chars=(s.body||'').length;
+    const delBtn=`<button class="btn btn-d btn-sm story-card-del" onclick="event.stopPropagation();deleteStory('${s.id}')">削除</button>`;
     if(finished){
       const sealHtml=mark
         ? mark.replace('<svg ','<svg style="width:52px;height:52px;display:block;" ')
@@ -3257,13 +3411,41 @@ function renderStoryList(){
           </div>
           ${sealHtml?`<div style="flex-shrink:0;opacity:0.85;">${sealHtml}</div>`:''}
         </div>
+        <div class="story-card-actions">${delBtn}</div>
       </div>`;
     }
     return `<div class="story-card" onclick="openStory('${s.id}')">
-      <div class="story-card-title">${escHtml(s.title||'無題')}</div>
-      <div class="story-card-meta">${date} ・ ${chars}字</div>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <div style="flex:1;min-width:0;">
+          <div class="story-card-title">${escHtml(s.title||'無題')}</div>
+          <div class="story-card-meta">${date} ・ ${chars}字</div>
+        </div>
+        ${delBtn}
+      </div>
     </div>`;
   }).join('');
+}
+
+function deleteStory(id){
+  const s=stories.find(s=>s.id===id);
+  if(!s)return;
+  const finished=!!s.finishedAt;
+  const title=s.title||'無題';
+  if(finished){
+    gmConfirm(`完成写本「${title}」を削除しますか？\nこの操作は取り消せません。`,()=>{
+      gmConfirm(`本当に削除しますか？\n写本のデータは完全に失われます。`,()=>{
+        stories=stories.filter(s=>s.id!==id);
+        localStorage.setItem(KEY_STORIES,JSON.stringify(stories));
+        renderStoryList();
+      });
+    });
+  } else {
+    gmConfirm(`「${title}」を削除しますか？\nこの操作は取り消せません。`,()=>{
+      stories=stories.filter(s=>s.id!==id);
+      localStorage.setItem(KEY_STORIES,JSON.stringify(stories));
+      renderStoryList();
+    });
+  }
 }
 
 function showStoryCreate(){
@@ -3899,7 +4081,7 @@ function storySearchFind(){
     idx=pos+1;
   }
   if(!_searchMatches.length){
-    document.getElementById('search-result-info').textContent='見つかりませんでした';
+    document.getElementById('search-result-info').textContent='紙片が欠けている⋯⋯';
     _searchIdx=-1; return;
   }
   _searchIdx=(_searchIdx+1<_searchMatches.length)?_searchIdx+1:0;
@@ -3940,7 +4122,7 @@ function storySearchReplaceAll(){
   const r=document.getElementById('search-replace').value;
   if(!q)return;
   const count=(ta.value.split(q).length-1);
-  if(!count){document.getElementById('search-result-info').textContent='見つかりませんでした';return;}
+  if(!count){document.getElementById('search-result-info').textContent='紙片が欠けている⋯⋯';return;}
   ta.value=ta.value.split(q).join(r);
   syncStoryBody(storyIsFullscreen?'fs':'main');
   updateStoryStats();
@@ -4140,50 +4322,36 @@ function importData(){
     reader.onload=ev=>{
       try{
         const data=JSON.parse(ev.target.result);
-        gmConfirm('データを読み込みます。既存データと統合（重複除外）して追加しますか？',()=>{
-          // characters
-          if(data.characters){
-            const ex=new Set(characters.map(c=>c.id));
-            data.characters.forEach(c=>{if(!ex.has(c.id))characters.push(c);});
-            localStorage.setItem(KEY_CHARS,JSON.stringify(characters));
-          }
-          // roles
-          if(data.roles){
-            const ex=new Set(roles.map(r=>r.id));
-            data.roles.forEach(r=>{if(!ex.has(r.id))roles.push(r);});
-            localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
-          }
-          // stories
-          if(data.stories){
-            const ex=new Set(stories.map(s=>s.id));
-            data.stories.forEach(s=>{if(!ex.has(s.id))stories.push(s);});
-            localStorage.setItem(KEY_STORIES,JSON.stringify(stories));
-          }
-          // storyTerms（配列：正式表記ベースで重複除外）
+        gmConfirm('バックアップから復元します。\n現在の全データは上書きされます。よろしいですか？',()=>{
+          // characters（完全上書き）
+          characters=data.characters||[];
+          localStorage.setItem(KEY_CHARS,JSON.stringify(characters));
+          // roles（完全上書き）
+          roles=data.roles||[];
+          localStorage.setItem(KEY_ROLES,JSON.stringify(roles));
+          // stories（完全上書き）
+          stories=data.stories||[];
+          localStorage.setItem(KEY_STORIES,JSON.stringify(stories));
+          // storyTerms（完全上書き）
           if(data.storyTerms&&Array.isArray(data.storyTerms)){
-            const cur=JSON.parse(localStorage.getItem(KEY_STORY_TERMS)||'[]');
-            const ex=new Set(cur.map(t=>t.correct));
-            data.storyTerms.forEach(t=>{if(!ex.has(t.correct))cur.push(t);});
-            localStorage.setItem(KEY_STORY_TERMS,JSON.stringify(cur));
+            localStorage.setItem(KEY_STORY_TERMS,JSON.stringify(data.storyTerms));
+            loadTerms();
           }
-          // memo（既存が空なら復元）
-          if(data.memo&&!localStorage.getItem(MEMO_KEY)){
-            localStorage.setItem(MEMO_KEY,data.memo);
+          // memo（完全上書き）
+          if(data.memo!==undefined){
+            localStorage.setItem(MEMO_KEY,data.memo||'');
           }
-          // mindmap（既存が空なら復元）
-          if(data.mindmap&&!localStorage.getItem(MM_KEY)){
+          // mindmap（完全上書き）
+          if(data.mindmap!==undefined){
             localStorage.setItem(MM_KEY,JSON.stringify(data.mindmap));
           }
-          // sharedStories
+          // sharedStories（完全上書き）
           if(data.sharedStories&&Array.isArray(data.sharedStories)){
-            const cur=JSON.parse(localStorage.getItem(KEY_SHARED_STORIES)||'[]');
-            const ex=new Set(cur.map(s=>s.id));
-            data.sharedStories.forEach(s=>{if(!ex.has(s.id))cur.push(s);});
-            localStorage.setItem(KEY_SHARED_STORIES,JSON.stringify(cur));
+            localStorage.setItem(KEY_SHARED_STORIES,JSON.stringify(data.sharedStories));
             loadSharedStories();
           }
-          // worldDB（既存がなければ復元）
-          if(data.worldDB&&!worldDB){
+          // worldDB（完全上書き）
+          if(data.worldDB){
             worldDB=data.worldDB;
             localStorage.setItem(KEY_DB,JSON.stringify(worldDB));
           }
@@ -4191,9 +4359,9 @@ function importData(){
             renderCharList();
             renderStoryList();
             closeOptions();
-            gmAlert('読み込みが完了しました');
+            gmAlert('復元が完了しました');
           };
-          if(data.apiKey&&!apiKey){
+          if(data.apiKey){
             gmConfirm('ファイルにAPIキーが含まれています。復元しますか？',()=>{
               apiKey=data.apiKey; localStorage.setItem(KEY_API,apiKey); unlockAnalyze();
               doFinish();
@@ -4237,7 +4405,7 @@ function renderDB(){
   let entries=worldDB.entries||[];
   if(catId)entries=entries.filter(e=>e.catId===catId);
   if(q)entries=entries.filter(e=>e.title?.toLowerCase().includes(q)||e.body?.toLowerCase().includes(q)||(e.tags||[]).some(t=>t.toLowerCase().includes(q)));
-  if(!entries.length){area.innerHTML='<div class="empty"><div class="empty-icon">📚</div><div class="empty-text">記事が見つかりません</div></div>';return;}
+  if(!entries.length){area.innerHTML='<div class="empty"><div class="empty-text">紙片が欠けている⋯⋯</div></div>';return;}
   area.innerHTML='';
   entries.forEach(entry=>{
     const cat=(worldDB.categories||[]).find(c=>c.id===entry.catId);
@@ -5007,7 +5175,7 @@ function dismissBackupReminder(){
     // 画面全体フェードイン
     setTimeout(()=>ts.classList.add('fade-in'),30);
     // 各要素を順番にreveal
-    const delays={'.title-nostoi':400,'.title-grimoire':900,'.title-sub-jp':1300,'#title-btn-container':1600};
+    const delays={'.title-nostoi':400,'.title-grimoire':900,'.title-sub-jp':1300,'#title-version':1500,'#title-btn-container':1700};
     Object.entries(delays).forEach(([sel,ms])=>{
       setTimeout(()=>{
         const el=ts.querySelector(sel);
