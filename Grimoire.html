@@ -99,8 +99,9 @@ body.offline #bg-gradient{opacity:0;}
     radial-gradient(ellipse at 82% 108%, rgba(240,140,30,0.35) 0%, rgba(180,60,0,0.1) 18%, transparent 35%),
     linear-gradient(to top, rgba(220,100,20,0.15) 0%, rgba(180,60,0,0.05) 20%, transparent 36%);
   mix-blend-mode:screen;
-  transition:opacity 1.2s;
+  opacity:0;transition:opacity 1.2s;
 }
+body.app-active.online #bg-light{opacity:1;}
 body.offline #bg-light{opacity:0;}
 
 /* ── Canvas ── */
@@ -2036,6 +2037,7 @@ function launchApp(){
   app.style.display='block'; setTimeout(()=>app.classList.add('visible'),30);
   const badge=document.getElementById('online-badge');
   if(isOnline){
+    document.body.classList.add('online');
     badge.style.display='block';
     badge.textContent='● Online';
     badge.style.color='var(--accent2)';
@@ -2120,7 +2122,7 @@ function animateParticles(){
       hue:  Math.random()*20+5,
       sat:  95+Math.random()*5,
       lit:  45+Math.random()*15,
-      angle: Math.random()*Math.PI*2,
+      angle: (Math.random()-0.5)*0.55,
       spin:  (Math.random()-0.5)*0.15,
       rx: 1,
       ry: 1.6+Math.random()*0.8,
@@ -2145,17 +2147,25 @@ function animateParticles(){
     ctx.translate(p.x, p.y);
     ctx.rotate(p.angle);
 
-    const grd = ctx.createRadialGradient(0,0,0, 0,0, p.size*p.ry*2.5);
-    grd.addColorStop(0,   `hsla(${hueShift},${p.sat}%,${litShift+15}%,${alpha*0.6})`);
-    grd.addColorStop(0.4, `hsla(${hueShift},${p.sat}%,${litShift}%,${alpha*0.3})`);
+    const rw = p.size * p.rx;       // 横幅
+    const rh = p.size * p.ry * 1.4; // 縦の長さ
+
+    // グロー（外炎）
+    const grd = ctx.createRadialGradient(0, -rh*0.2, 0, 0, 0, rh*2.2);
+    grd.addColorStop(0,   `hsla(${hueShift},${p.sat}%,${litShift+15}%,${alpha*0.55})`);
+    grd.addColorStop(0.4, `hsla(${hueShift},${p.sat}%,${litShift}%,${alpha*0.25})`);
     grd.addColorStop(1,   `hsla(${hueShift},${p.sat}%,${litShift}%,0)`);
     ctx.beginPath();
-    ctx.ellipse(0, 0, p.size*p.rx*2.5, p.size*p.ry*2.5, 0, 0, Math.PI*2);
+    ctx.ellipse(0, 0, rw*2.2, rh*2.2, 0, 0, Math.PI*2);
     ctx.fillStyle = grd;
     ctx.fill();
 
+    // 本体：涙形（下が丸く上が尖る）
     ctx.beginPath();
-    ctx.ellipse(0, 0, p.size*p.rx, p.size*p.ry, 0, 0, Math.PI*2);
+    ctx.moveTo(0, -rh);                              // 上の尖端
+    ctx.bezierCurveTo( rw*0.5, -rh*0.2,  rw, rh*0.5,  0,  rh); // 右側曲線
+    ctx.bezierCurveTo(-rw,     rh*0.5,  -rw*0.5, -rh*0.2, 0, -rh); // 左側曲線
+    ctx.closePath();
     ctx.fillStyle = `hsla(${hueShift+5},${p.sat}%,${Math.min(litShift+15,75)}%,${alpha})`;
     ctx.fill();
 
@@ -2311,7 +2321,7 @@ function switchPage(name){
   if(options.animation)burstParticles(windDir);
   playSE('tab');
 }
-function switchAnalyzeTab(tab){
+function switchAnalyzeTab(tab, withSE=true){
   ['opp','self','assist','chat'].forEach(t=>{
     const panel=document.getElementById(`apanel-${t}`);
     panel.style.display='none';
@@ -2332,7 +2342,7 @@ function switchAnalyzeTab(tab){
   bagMenu.classList.toggle('chat-mode',isChat);
   // メニューが開いていたら閉じる（位置変更時のチラつき防止）
   if(bagOpen){ bagOpen=false; bagBtn.classList.remove('open'); bagMenu.classList.remove('open'); }
-  playSE('smalltab');
+  if(withSE) playSE('smalltab');
 }
 
 // ── 叙述チャット ──
@@ -2537,9 +2547,9 @@ function renderCharList(){
   });
 }
 
-function openCharDetail(id){
+function openCharDetail(id, withSE=true){
   currentCharId=id;
-  playSE('smalltab');
+  if(withSE) playSE('smalltab');
   const c=characters.find(c=>c.id===id);
   if(!c)return;
   const nameEl=document.getElementById('detail-char-name');
@@ -2603,7 +2613,7 @@ function showCharSheet(){
 }
 
 function cancelCharForm(){
-  if(editingCharId){openCharDetail(editingCharId);playSE('smalltab');}
+  if(editingCharId){openCharDetail(editingCharId);}
   else{showView('char-list-view');renderCharList();playSE('bookclosed');}
 }
 
@@ -2805,7 +2815,7 @@ function confirmLost(){
   c.lost=true;
   localStorage.setItem(KEY_CHARS,JSON.stringify(characters));
   closeModal('modal-lost-char');
-  openCharDetail(currentCharId);
+  openCharDetail(currentCharId, false);
   renderCharList();
 }
 function confirmRevive(){
@@ -2815,7 +2825,7 @@ function confirmRevive(){
   c.lost=false;
   localStorage.setItem(KEY_CHARS,JSON.stringify(characters));
   closeModal('modal-revive-char');
-  openCharDetail(currentCharId);
+  openCharDetail(currentCharId, false);
   renderCharList();
 }
 let _deleteFinalTimer=null;
@@ -3034,7 +3044,7 @@ function sendToGrimoire(id){
   const textEl=document.getElementById(`${targetTab}-text`);
   if(textEl) textEl.value=r.body;
   switchPage('analyze');
-  switchAnalyzeTab(targetTab);
+  switchAnalyzeTab(targetTab, false);
   document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('bnav-analyze').classList.add('active');
 }
